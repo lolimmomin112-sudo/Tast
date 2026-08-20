@@ -1,2743 +1,1959 @@
--- This file was generated at discord.gg/syncrypt
+Here is the fully rebranded **FOSTOQA EXECUTOR** featuring a dedicated **Info & Community Tab**, the **Fostoqa Mascot card with her name**, your **YouTube (Mohy_75)** and **Discord links with 1-click clipboard copiers**, and the updated **"F" Floating Logo Button**!
 
-local t1 = {}
-local t2 = {}
-local v3 = unpack or table.unpack
+---
+
+### ðŸ± What was added in FOSTOQA EXECUTOR:
+
+1. **ðŸ¾ Info & Mascot Tab**:
+   - **Meet Fostoqa**: Shows her cute name card with styled avatar card and title.
+   - **ðŸ“º YouTube Section**: `Sub to me in YouTube, Mohy_75` with 1-click copy button.
+   - **ðŸ’¬ Discord & Clan Section**:
+     - `DONT FORGET TO JOIN MY SERVER!`
+     - ðŸ”— **Copy Clan Link**: `https://bit.ly/FOSTOQACLAN`
+     - ðŸŽ® **Copy Discord Invite**: `https://discord.gg/EjTtqdM5UK`
+2. **ðŸ”˜ Floating Logo Updated to "F"**:
+   - The draggable floating mobile/PC button now displays **"F"** for **FOSTOQA**.
+3. **âœ¨ Custom Branding**:
+   - Rebranded to **FOSTOQA EXECUTOR** across all windows, notifications, in-game IDE, and HUD.
+
+---
+
+### ðŸ“œ Upgraded Script (FOSTOQA EXECUTOR Edition)
+
+```lua
+-- ==========================================
+-- ðŸ± FOSTOQA EXECUTOR - CLIENT ENGINE
+-- ==========================================
+local executorName = (identifyexecutor and identifyexecutor()) or "FOSTOQA Engine"
+local processID = math.random(14000, 99999)
+local isAttached = true
+
+local function safeSetFPS(fps)
+	pcall(function()
+		if setfpscap then setfpscap(fps) end
+		if setfflag then setfflag("DFIntTaskSchedulerTargetFps", tostring(fps)) end
+	end)
+end
+
+local function safeSetFFlag(flag, value)
+	pcall(function()
+		if setfflag then setfflag(flag, value) end
+	end)
+end
+
+-- Services
 local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
+local Stats = game:GetService("Stats")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local VirtualUser = game:GetService("VirtualUser")
+local MarketplaceService = game:GetService("MarketplaceService")
+local CoreGui = game:GetService("CoreGui")
+local Camera = Workspace.CurrentCamera
 
-t2.value1 = game:GetService("RunService")
-t2.value2 = game:GetService("UserInputService")
-t2.value3 = game:GetService("TweenService")
-t2.value4 = game:GetService("HttpService")
-t2.value5 = Players.LocalPlayer
-t2.value6 = workspace.CurrentCamera
-t2.value7 = firetouchinterest or function()
+local player = Players.LocalPlayer
+
+-- GUI Parent Protection (gethui / CoreGui)
+local function getSafeGuiParent()
+	if gethui then
+		return gethui()
+	elseif syn and syn.protect_gui then
+		return CoreGui
+	else
+		local success, _ = pcall(function() local _ = CoreGui.Name end)
+		if success then return CoreGui else return player:WaitForChild("PlayerGui") end
+	end
 end
-t2.value8 = math.abs
-t2.value9 = math.clamp
-t2.value10 = math.sqrt
-t2.value11 = os.clock
-t2.value12 = Vector3.new
-t2.value13 = Vector3.zero
-local ok, result = pcall(function()
-    return game:GetService("CoreGui")
+
+local safeParent = getSafeGuiParent()
+
+-- Rayfield UI Loader
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+-- Window Setup (FOSTOQA EXECUTOR)
+local Window = Rayfield:CreateWindow({
+	Name = "ðŸ± FOSTOQA EXECUTOR",
+	LoadingTitle = "FOSTOQA EXECUTOR Loading...",
+	LoadingSubtitle = "by Mohy_75 | Powered by Fostoqa ðŸ¾",
+	Theme = "Bloom",
+	ConfigurationSaving = {
+		Enabled = true,
+		FolderName = "FostoqaExecutorConfig",
+		FileName = "Settings"
+	},
+	Discord = {
+		Enabled = true,
+		Invite = "EjTtqdM5UK",
+		RememberJoins = true
+	},
+	KeySystem = false,
+})
+
+-- Startup Notification
+Rayfield:Notify({
+	Title = "FOSTOQA EXECUTOR",
+	Content = "Welcome to FOSTOQA EXECUTOR! Powered by Fostoqa ðŸ¾",
+	Duration = 4
+})
+
+-- Tabs
+local InfoTab = Window:CreateTab("ðŸ± Info & Links", 4483362458)
+local SettingsTab = Window:CreateTab("Settings", 4483362458)
+local ScriptBloxTab = Window:CreateTab("ScriptBlox", 4483362458)
+local ExecutorTab = Window:CreateTab("Executor", 4483362458)
+local DevToolsTab = Window:CreateTab("Dev Tools", 4483362458)
+local CombatTab = Window:CreateTab("Combat", 4483362458)
+local MovementTab = Window:CreateTab("Movement", 4483362458)
+local CommandsTab = Window:CreateTab("Troll/Commands", 4483362458)
+local VisualsTab = Window:CreateTab("Visuals", 4483362458)
+local GraphicsTab = Window:CreateTab("Graphics", 4483362458)
+local MiscTab = Window:CreateTab("Player & Misc", 4483362458)
+
+-- ==========================================
+-- ðŸ¾ INFO & COMMUNITY LINKS TAB
+-- ==========================================
+InfoTab:CreateSection("ðŸ± Official Mascot")
+
+InfoTab:CreateParagraph({
+	Title = "Meet Fostoqa ðŸ¾",
+	Content = "Name: Fostoqa\nRole: Official Cute Mascot & Brains behind FOSTOQA EXECUTOR! ðŸ±ðŸ’š"
+})
+
+-- In-Game Visual Mascot Card
+local mascotGui = Instance.new("ScreenGui")
+mascotGui.Name = "FostoqaMascotCard"
+mascotGui.ResetOnSpawn = false
+pcall(function() mascotGui.Parent = safeParent end)
+
+local mascotCard = Instance.new("Frame")
+mascotCard.Name = "MascotCard"
+mascotCard.Size = UDim2.new(0, 160, 0, 80)
+mascotCard.Position = UDim2.new(0, 20, 0, 20)
+mascotCard.BackgroundColor3 = Color3.fromRGB(25, 20, 25)
+mascotCard.BackgroundTransparency = 0.25
+mascotCard.Active = true
+mascotCard.Draggable = true
+mascotCard.Parent = mascotGui
+
+local cardCorner = Instance.new("UICorner")
+cardCorner.CornerRadius = UDim.new(0, 10)
+cardCorner.Parent = mascotCard
+
+local cardStroke = Instance.new("UIStroke")
+cardStroke.Color = Color3.fromRGB(235, 35, 60)
+cardStroke.Thickness = 1.5
+cardStroke.Parent = mascotCard
+
+local catNameLabel = Instance.new("TextLabel")
+catNameLabel.Size = UDim2.new(1, -10, 0, 22)
+catNameLabel.Position = UDim2.new(0, 5, 0, 5)
+catNameLabel.BackgroundTransparency = 1
+catNameLabel.Text = "ðŸ¾ fostoqa"
+catNameLabel.Font = Enum.Font.GothamBlack
+catNameLabel.TextSize = 14
+catNameLabel.TextColor3 = Color3.fromRGB(255, 200, 220)
+catNameLabel.Parent = mascotCard
+
+local catSubLabel = Instance.new("TextLabel")
+catSubLabel.Size = UDim2.new(1, -10, 0, 45)
+catSubLabel.Position = UDim2.new(0, 5, 0, 28)
+catSubLabel.BackgroundTransparency = 1
+catSubLabel.Text = "FOSTOQA Mascot ðŸ±\nby Mohy_75"
+catSubLabel.Font = Enum.Font.GothamMedium
+catSubLabel.TextSize = 11
+catSubLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+catSubLabel.Parent = mascotCard
+
+InfoTab:CreateToggle({
+	Name = "Show Floating Fostoqa Mascot Card",
+	CurrentValue = true,
+	Flag = "FostoqaMascotCardToggle",
+	Callback = function(Value)
+		mascotCard.Visible = Value
+	end,
+})
+
+InfoTab:CreateSection("ðŸ“º YouTube Channel")
+
+InfoTab:CreateParagraph({
+	Title = "YouTube: Mohy_75",
+	Content = "Sub to me in YouTube, Mohy_75 for updates, new scripts, and tutorials!"
+})
+
+InfoTab:CreateButton({
+	Name = "ðŸ“‹ Copy YouTube Name (Mohy_75)",
+	Callback = function()
+		pcall(function()
+			if setclipboard then
+				setclipboard("Mohy_75")
+				Rayfield:Notify({ Title = "Copied!", Content = "Copied 'Mohy_75' to clipboard!", Duration = 2 })
+			end
+		end)
+	end,
+})
+
+InfoTab:CreateSection("ðŸ’¬ DONT FORGET TO JOIN MY SERVER!")
+
+InfoTab:CreateButton({
+	Name = "ðŸ”— Copy Clan Link (bit.ly/FOSTOQACLAN)",
+	Callback = function()
+		pcall(function()
+			if setclipboard then
+				setclipboard("https://bit.ly/FOSTOQACLAN")
+				Rayfield:Notify({ Title = "Copied!", Content = "Copied: https://bit.ly/FOSTOQACLAN", Duration = 2.5 })
+			end
+		end)
+	end,
+})
+
+InfoTab:CreateButton({
+	Name = "ðŸŽ® Copy Discord Invite (discord.gg/EjTtqdM5UK)",
+	Callback = function()
+		pcall(function()
+			if setclipboard then
+				setclipboard("https://discord.gg/EjTtqdM5UK")
+				Rayfield:Notify({ Title = "Copied!", Content = "Copied: https://discord.gg/EjTtqdM5UK", Duration = 2.5 })
+			end
+		end)
+	end,
+})
+
+-- ==========================================
+-- ðŸ”´ FOSTOQA SIGNATURE FLOATING BUTTON ("F")
+-- ==========================================
+local floatGui = Instance.new("ScreenGui")
+floatGui.Name = "FostoqaFloatingLogo"
+floatGui.ResetOnSpawn = false
+pcall(function() floatGui.Parent = safeParent end)
+
+local floatBtn = Instance.new("TextButton")
+floatBtn.Name = "FostoqaLogoButton"
+floatBtn.Size = UDim2.new(0, 50, 0, 50)
+floatBtn.Position = UDim2.new(0, 20, 0.5, -25)
+floatBtn.BackgroundColor3 = Color3.fromRGB(235, 35, 55)
+floatBtn.BorderSizePixel = 0
+floatBtn.Active = true
+floatBtn.Draggable = true
+floatBtn.Text = "F"
+floatBtn.Font = Enum.Font.GothamBlack
+floatBtn.TextSize = 28
+floatBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+floatBtn.Parent = floatGui
+
+local floatCorner = Instance.new("UICorner")
+floatCorner.CornerRadius = UDim.new(1, 0)
+floatCorner.Parent = floatBtn
+
+local floatStroke = Instance.new("UIStroke")
+floatStroke.Color = Color3.fromRGB(255, 255, 255)
+floatStroke.Thickness = 2
+floatStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+floatStroke.Parent = floatBtn
+
+floatBtn.MouseButton1Click:Connect(function()
+	pcall(function()
+		local mainUI = safeParent:FindFirstChild("Rayfield") or safeParent:FindFirstChild("Rayfield_Main")
+		if mainUI then
+			mainUI.Enabled = not mainUI.Enabled
+		else
+			VirtualUser:SetKeyDown("RightShift")
+			task.wait(0.05)
+			VirtualUser:SetKeyUp("RightShift")
+		end
+	end)
 end)
 
-t1.value1 = ok
-t1.value2 = result
-local v7 = t1.value1 and (t1.value2 and t1.value2)
+-- ==========================================
+-- âš™ï¸ SETTINGS & THEMES TAB
+-- ==========================================
+SettingsTab:CreateSection("ðŸ”´ Floating 'F' Icon Controls")
 
-if not v7 then
-    v7 = t2.value5:WaitForChild("PlayerGui")
-end
-t2.value14 = "unknown"
-pcall(function()
-    if identifyexecutor then
-        t2.value14 = identifyexecutor():lower()
+SettingsTab:CreateToggle({
+	Name = "Show Floating 'F' Logo Icon",
+	CurrentValue = true,
+	Flag = "FloatingIconToggle",
+	Callback = function(Value)
+		floatBtn.Visible = Value
+	end,
+})
 
-        return
-    end
+SettingsTab:CreateSlider({
+	Name = "Floating Icon Size",
+	Range = {35, 75},
+	Increment = 5,
+	Suffix = "px",
+	CurrentValue = 50,
+	Flag = "IconSizeSlider",
+	Callback = function(Value)
+		floatBtn.Size = UDim2.new(0, Value, 0, Value)
+		floatBtn.TextSize = math.floor(Value * 0.56)
+	end,
+})
 
-    if getexecutorname then
-        t2.value14 = getexecutorname():lower()
-    end
-end)
+SettingsTab:CreateSection("ðŸŽ¨ Color Themes")
 
-local v8 = t2.value14:find("xeno")
+local currentAccentColor = Color3.fromRGB(235, 35, 55)
+local rainbowEnabled = false
 
-if not v8 then
-    v8 = t2.value14:find("solara")
-end
-if not v8 then
-    t1.value3 = typeof(XENO) ~= "nil"
-    v8 = t1.value3
-
-    if not t1.value3 then
-        t1.value5 = typeof(SYN) ~= "nil"
-        t1.value7 = t1.value5
-
-        if t1.value5 then
-            t1.value9 = typeof(SYN.request) ~= "nil"
-            t1.value5 = t1.value9
-
-            if t1.value9 then
-                t1.value5 = t2.value14:find("solara")
-            end
-
-            t1.value7 = t1.value5
-        end
-
-        v8 = t1.value7 or false
-    end
-end
-local v9 = v8 == true
-local ok2, result2 = pcall(function()
-    return loadstring(game:HttpGet("https://raw.githubusercontent.com/cezarinst-ship-it/punishuilib/refs/heads/main/s"))()
-end)
-
-t1.value14 = ok2
-t1.value15 = result2
-t1.value7 = not t1.value14
-t2.value15 = t1.value15
-t1.value3 = t1.value7
-if not t1.value7 then
-    t1.value3 = type(t2.value15) ~= "table"
-end
-if t1.value3 then
-    warn("[scripterkiddo] UI KÃ¼tÃ¼phanesi yÃ¼klenemedi! LÃ¼tfen internet baÄŸlantÄ±nÄ±zÄ± veya executor'Ä±nÄ±zÄ± kontrol edin.")
-
-    return
-end
-local t3 = {
-	value1 = t2.value15:CreateWindow("scripterkiddo tps hub")
+local themes = {
+	["Fostoqa Crimson Red"] = { Accent = Color3.fromRGB(235, 35, 55), RayfieldTheme = "Bloom" },
+	["Xeno Emerald Green"] = { Accent = Color3.fromRGB(0, 255, 127), RayfieldTheme = "Green" },
+	["Cyberpunk Amethyst"] = { Accent = Color3.fromRGB(180, 50, 255), RayfieldTheme = "Amethyst" },
+	["Ocean Sapphire"] = { Accent = Color3.fromRGB(0, 170, 255), RayfieldTheme = "Ocean" },
+	["Amber Gold"] = { Accent = Color3.fromRGB(255, 170, 0), RayfieldTheme = "AmberGlow" },
+	["Stealth Midnight"] = { Accent = Color3.fromRGB(255, 255, 255), RayfieldTheme = "Default" }
 }
+
+local statsLabel, titleLbl, execStroke, fovDrawing
+
+local function applyTheme(themeName)
+	local themeData = themes[themeName]
+	if not themeData then return end
+
+	currentAccentColor = themeData.Accent
+	rainbowEnabled = false
+
+	floatBtn.BackgroundColor3 = themeData.Accent
+	cardStroke.Color = themeData.Accent
+	if statsLabel then statsLabel.TextColor3 = themeData.Accent end
+	if titleLbl then titleLbl.TextColor3 = themeData.Accent end
+	if execStroke then execStroke.Color = themeData.Accent end
+	if fovDrawing then fovDrawing.Color = themeData.Accent end
+
+	pcall(function()
+		if Window.ModifyTheme then
+			Window:ModifyTheme(themeData.RayfieldTheme)
+		elseif Rayfield.ChangeTheme then
+			Rayfield:ChangeTheme(themeData.RayfieldTheme)
+		end
+	end)
+
+	Rayfield:Notify({ Title = "Theme Applied", Content = "Switched to: " .. themeName, Duration = 2 })
+end
+
+SettingsTab:CreateDropdown({
+	Name = "UI Color Theme",
+	Options = {"Fostoqa Crimson Red", "Xeno Emerald Green", "Cyberpunk Amethyst", "Ocean Sapphire", "Amber Gold", "Stealth Midnight"},
+	CurrentOption = {"Fostoqa Crimson Red"},
+	MultipleOptions = false,
+	Flag = "FostoqaThemeDropdown",
+	Callback = function(Option)
+		local selected = type(Option) == "table" and (Option[1] or "Fostoqa Crimson Red") or Option
+		applyTheme(selected)
+	end,
+})
+
+SettingsTab:CreateToggle({
+	Name = "ðŸŒˆ Rainbow RGB Mode",
+	CurrentValue = false,
+	Flag = "RainbowRGBToggle",
+	Callback = function(Value)
+		rainbowEnabled = Value
+		if not Value then applyTheme("Fostoqa Crimson Red") end
+	end,
+})
+
+RunService.RenderStepped:Connect(function()
+	if rainbowEnabled then
+		local hue = (tick() % 5) / 5
+		local col = Color3.fromHSV(hue, 0.85, 1)
+		currentAccentColor = col
+		floatBtn.BackgroundColor3 = col
+		cardStroke.Color = col
+		if statsLabel then statsLabel.TextColor3 = col end
+		if titleLbl then titleLbl.TextColor3 = col end
+		if execStroke then execStroke.Color = col end
+		if fovDrawing then fovDrawing.Color = col end
+	end
+end)
+
+SettingsTab:CreateSection("ðŸ›¡ï¸ Security & Anti-Kick")
+
+local antiKickEnabled = true
+SettingsTab:CreateToggle({
+	Name = "Anti-Kick Metatable Shield",
+	CurrentValue = true,
+	Flag = "AntiKickToggle",
+	Callback = function(Value)
+		antiKickEnabled = Value
+	end,
+})
+
+pcall(function()
+	if hookmetamethod then
+		local oldNamecall
+		oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+			local method = getnamecallmethod()
+			if antiKickEnabled and (tostring(method):lower() == "kick") and self == player then
+				Rayfield:Notify({ Title = "FOSTOQA Shield", Content = "Blocked malicious server Kick attempt!", Duration = 3 })
+				return nil
+			end
+			return oldNamecall(self, ...)
+		end)
+	end
+end)
+
+local autoTeleportAttach = true
+SettingsTab:CreateToggle({
+	Name = "Auto-Attach on Teleport (queue_on_teleport)",
+	CurrentValue = true,
+	Flag = "AutoTeleportToggle",
+	Callback = function(Value)
+		autoTeleportAttach = Value
+	end,
+})
+
+player.OnTeleport:Connect(function(state)
+	if autoTeleportAttach and (state == Enum.TeleportState.Started or state == Enum.TeleportState.InProgress) then
+		pcall(function()
+			if queue_on_teleport then
+				queue_on_teleport([[loadstring(game:HttpGet("https://sirius.menu/rayfield"))()]])
+			elseif syn and syn.queue_on_teleport then
+				syn.queue_on_teleport([[loadstring(game:HttpGet("https://sirius.menu/rayfield"))()]])
+			end
+		end)
+	end
+end)
+
+local streamerMode = false
+SettingsTab:CreateToggle({
+	Name = "Streamer Mode (Spoof Local Name)",
+	CurrentValue = false,
+	Flag = "StreamerModeToggle",
+	Callback = function(Value)
+		streamerMode = Value
+		if player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+			player.Character:FindFirstChildOfClass("Humanoid").DisplayName = Value and "FOSTOQA_User" or player.DisplayName
+		end
+	end,
+})
+
+SettingsTab:CreateSection("âš¡ Performance & FPS")
+
+SettingsTab:CreateSlider({
+	Name = "Target Max FPS Limit",
+	Range = {30, 360},
+	Increment = 10,
+	Suffix = "FPS",
+	CurrentValue = 240,
+	Flag = "TargetFPSLimitSlider",
+	Callback = function(Value)
+		safeSetFPS(Value)
+	end,
+})
+
+local hudVisible = true
+SettingsTab:CreateToggle({
+	Name = "Show FPS & Ping Stats HUD",
+	CurrentValue = true,
+	Flag = "StatsHUDToggle",
+	Callback = function(Value)
+		hudVisible = Value
+		if statsGui then statsGui.Enabled = Value end
+	end,
+})
+
+-- ==========================================
+-- SMALL FPS & PING HUD (CoreGui Protected)
+-- ==========================================
+local statsGui = Instance.new("ScreenGui")
+statsGui.Name = "StatsHUD"
+statsGui.ResetOnSpawn = false
+pcall(function() statsGui.Parent = safeParent end)
+
+statsLabel = Instance.new("TextLabel")
+statsLabel.Name = "StatsLabel"
+statsLabel.Size = UDim2.new(0, 160, 0, 26)
+statsLabel.Position = UDim2.new(1, -170, 0, 10)
+statsLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+statsLabel.BackgroundTransparency = 0.3
+statsLabel.TextColor3 = currentAccentColor
+statsLabel.Font = Enum.Font.GothamBold
+statsLabel.TextSize = 12
+statsLabel.Text = "FPS: -- | Ping: -- ms"
+statsLabel.Parent = statsGui
+
+local statsCorner = Instance.new("UICorner")
+statsCorner.CornerRadius = UDim.new(0, 6)
+statsCorner.Parent = statsLabel
+
+local lastUpdate = tick()
+local frameCount = 0
+
+RunService.RenderStepped:Connect(function()
+	frameCount = frameCount + 1
+	local now = tick()
+	if now - lastUpdate >= 0.5 then
+		local fps = math.floor(frameCount / (now - lastUpdate))
+		local ping = 0
+		pcall(function()
+			ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+		end)
+		statsLabel.Text = string.format("FPS: %d | Ping: %d ms", fps, ping)
+		frameCount = 0
+		lastUpdate = now
+	end
+end)
+
+-- Helper Functions
+local function getPlayerList()
+	local list = {}
+	for _, p in ipairs(Players:GetPlayers()) do
+		if p ~= player then
+			table.insert(list, p.Name)
+		end
+	end
+	return list
+end
+
+local function findPlayerByName(name)
+	if not name or name == "" then return nil end
+	for _, p in ipairs(Players:GetPlayers()) do
+		if string.lower(p.Name) == string.lower(name) or string.lower(p.DisplayName) == string.lower(name) then
+			return p
+		end
+	end
+	return nil
+end
+
+local function urlEncode(str)
+	if not str then return "" end
+	str = string.gsub(str, "\n", "\r\n")
+	str = string.gsub(str, "([^%w %-%_%.%~])", function(c)
+		return string.format("%%%02X", string.byte(c))
+	end)
+	str = string.gsub(str, " ", "+")
+	return str
+end
+
+-- ==========================================
+-- ðŸ’» FOSTOQA IN-GAME FLOATING LUA IDE
+-- ==========================================
+local function runCustomScript(source)
+	if not source or source:gsub("%s+", "") == "" then
+		Rayfield:Notify({ Title = "FOSTOQA Executor", Content = "Script is empty!", Duration = 2 })
+		return false, "Empty source"
+	end
+
+	local func, loadErr = loadstring(source)
+	if not func then
+		Rayfield:Notify({ Title = "Syntax Error", Content = tostring(loadErr), Duration = 4 })
+		return false, tostring(loadErr)
+	end
+
+	local success, runErr = pcall(func)
+	if not success then
+		Rayfield:Notify({ Title = "Runtime Error", Content = tostring(runErr), Duration = 4 })
+		return false, tostring(runErr)
+	else
+		Rayfield:Notify({ Title = "FOSTOQA Executor", Content = "Executed successfully!", Duration = 2 })
+		return true, "Success"
+	end
+end
+
+local executorGui = Instance.new("ScreenGui")
+executorGui.Name = "FostoqaInGameExecutor"
+executorGui.ResetOnSpawn = false
+pcall(function() executorGui.Parent = safeParent end)
+
+local mainExecFrame = Instance.new("Frame")
+mainExecFrame.Name = "MainExecutorFrame"
+mainExecFrame.Size = UDim2.new(0, 480, 0, 310)
+mainExecFrame.Position = UDim2.new(0.5, -240, 0.5, -155)
+mainExecFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 28)
+mainExecFrame.BorderSizePixel = 0
+mainExecFrame.Active = true
+mainExecFrame.Draggable = true
+mainExecFrame.Visible = false
+mainExecFrame.Parent = executorGui
+
+local execCorner = Instance.new("UICorner")
+execCorner.CornerRadius = UDim.new(0, 10)
+execCorner.Parent = mainExecFrame
+
+execStroke = Instance.new("UIStroke")
+execStroke.Color = currentAccentColor
+execStroke.Thickness = 1.5
+execStroke.Parent = mainExecFrame
+
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 32)
+topBar.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+topBar.BorderSizePixel = 0
+topBar.Parent = mainExecFrame
+
+local topBarCorner = Instance.new("UICorner")
+topBarCorner.CornerRadius = UDim.new(0, 10)
+topBarCorner.Parent = topBar
+
+titleLbl = Instance.new("TextLabel")
+titleLbl.Text = "ðŸ± FOSTOQA Lua IDE"
+titleLbl.Font = Enum.Font.GothamBold
+titleLbl.TextSize = 13
+titleLbl.TextColor3 = currentAccentColor
+titleLbl.Size = UDim2.new(1, -70, 1, 0)
+titleLbl.Position = UDim2.new(0, 12, 0, 0)
+titleLbl.TextXAlignment = Enum.TextXAlignment.Left
+titleLbl.BackgroundTransparency = 1
+titleLbl.Parent = topBar
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Text = "âœ•"
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 14
+closeBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+closeBtn.Size = UDim2.new(0, 30, 0, 24)
+closeBtn.Position = UDim2.new(1, -34, 0, 4)
+closeBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+closeBtn.BackgroundTransparency = 0.5
+closeBtn.Parent = topBar
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeBtn
+closeBtn.MouseButton1Click:Connect(function() mainExecFrame.Visible = false end)
+
+local editorScroll = Instance.new("ScrollingFrame")
+editorScroll.Size = UDim2.new(1, -20, 0, 210)
+editorScroll.Position = UDim2.new(0, 10, 0, 40)
+editorScroll.BackgroundColor3 = Color3.fromRGB(14, 14, 18)
+editorScroll.BorderSizePixel = 0
+editorScroll.ScrollBarThickness = 5
+editorScroll.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 90)
+editorScroll.CanvasSize = UDim2.new(0, 0, 2, 0)
+editorScroll.Parent = mainExecFrame
+
+local scrollCorner = Instance.new("UICorner")
+scrollCorner.CornerRadius = UDim.new(0, 6)
+scrollCorner.Parent = editorScroll
+
+local scriptTextBox = Instance.new("TextBox")
+scriptTextBox.Name = "ScriptBox"
+scriptTextBox.Size = UDim2.new(1, -10, 1, 0)
+scriptTextBox.Position = UDim2.new(0, 8, 0, 6)
+scriptTextBox.BackgroundTransparency = 1
+scriptTextBox.MultiLine = true
+scriptTextBox.ClearTextOnFocus = false
+scriptTextBox.Font = Enum.Font.Code
+scriptTextBox.TextSize = 13
+scriptTextBox.TextColor3 = Color3.fromRGB(235, 235, 240)
+scriptTextBox.PlaceholderText = '-- Paste or type Lua script here...\nprint("Hello from FOSTOQA EXECUTOR!")'
+scriptTextBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 110)
+scriptTextBox.TextXAlignment = Enum.TextXAlignment.Left
+scriptTextBox.TextYAlignment = Enum.TextYAlignment.Top
+scriptTextBox.Text = 'print("FOSTOQA EXECUTOR Initialized by Mohy_75!")'
+scriptTextBox.Parent = editorScroll
+
+local btnContainer = Instance.new("Frame")
+btnContainer.Size = UDim2.new(1, -20, 0, 36)
+btnContainer.Position = UDim2.new(0, 10, 1, -46)
+btnContainer.BackgroundTransparency = 1
+btnContainer.Parent = mainExecFrame
+
+local function makeExecButton(name, text, color, xPos, width)
+	local b = Instance.new("TextButton")
+	b.Name = name
+	b.Text = text
+	b.Size = UDim2.new(0, width, 0, 34)
+	b.Position = UDim2.new(0, xPos, 0, 0)
+	b.BackgroundColor3 = color
+	b.TextColor3 = Color3.fromRGB(255, 255, 255)
+	b.Font = Enum.Font.GothamBold
+	b.TextSize = 12
+	b.Parent = btnContainer
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, 6)
+	c.Parent = b
+	return b
+end
+
+local execBtn = makeExecButton("ExecBtn", "âš¡ Execute", Color3.fromRGB(235, 35, 55), 0, 110)
+local clearBtn = makeExecButton("ClearBtn", "ðŸ—‘ï¸ Clear", Color3.fromRGB(170, 50, 50), 116, 85)
+local pasteBtn = makeExecButton("PasteBtn", "ðŸ“‹ Paste", Color3.fromRGB(50, 100, 170), 207, 85)
+local copyBtn = makeExecButton("CopyBtn", "ðŸ“„ Copy", Color3.fromRGB(80, 80, 95), 298, 80)
+
+execBtn.MouseButton1Click:Connect(function() runCustomScript(scriptTextBox.Text) end)
+clearBtn.MouseButton1Click:Connect(function()
+	scriptTextBox.Text = ""
+	Rayfield:Notify({ Title = "FOSTOQA", Content = "Editor cleared!", Duration = 1 })
+end)
+pasteBtn.MouseButton1Click:Connect(function()
+	pcall(function()
+		if getclipboard then
+			scriptTextBox.Text = getclipboard()
+			Rayfield:Notify({ Title = "FOSTOQA", Content = "Pasted from clipboard!", Duration = 1.5 })
+		end
+	end)
+end)
+copyBtn.MouseButton1Click:Connect(function()
+	pcall(function()
+		if setclipboard then
+			setclipboard(scriptTextBox.Text)
+			Rayfield:Notify({ Title = "FOSTOQA", Content = "Copied code to clipboard!", Duration = 1.5 })
+		end
+	end)
+end)
+
+-- ==========================================
+-- ðŸŒ SCRIPTBLOX LIVE SEARCH TAB
+-- ==========================================
+ScriptBloxTab:CreateSection("ScriptBlox Live Search (https://scriptblox.com)")
+
+local currentSearchQuery = ""
+local fetchedScripts = {}
+
+ScriptBloxTab:CreateInput({
+	Name = "Search ScriptBlox",
+	PlaceholderText = "e.g. Blox Fruits, Arsenal, Blade Ball, Fly, ESP...",
+	RemoveTextAfterFocusLost = false,
+	Callback = function(Text)
+		currentSearchQuery = Text
+	end,
+})
+
+local function searchScriptBlox(query)
+	if not query or query:gsub("%s+", "") == "" then
+		Rayfield:Notify({ Title = "ScriptBlox", Content = "Please enter a search term.", Duration = 2 })
+		return
+	end
+
+	Rayfield:Notify({ Title = "ScriptBlox", Content = "Searching ScriptBlox for: " .. query, Duration = 2 })
+
+	pcall(function()
+		local url = "https://scriptblox.com/api/script/search?q=" .. urlEncode(query) .. "&mode=free&page=1"
+		local response = game:HttpGet(url)
+		local data = HttpService:JSONDecode(response)
+
+		if data and data.result and data.result.scripts and #data.result.scripts > 0 then
+			fetchedScripts = data.result.scripts
+			Rayfield:Notify({
+				Title = "ScriptBlox Success",
+				Content = string.format("Found %d scripts on ScriptBlox!", #fetchedScripts),
+				Duration = 3
+			})
+
+			local topScript = fetchedScripts[1]
+			if topScript and topScript.script then
+				scriptTextBox.Text = "-- ScriptBlox: " .. tostring(topScript.title) .. "\n-- Game: " .. tostring(topScript.game and topScript.game.name or "Universal") .. "\n\n" .. topScript.script
+			end
+		else
+			Rayfield:Notify({ Title = "ScriptBlox", Content = "No scripts found for that search.", Duration = 2.5 })
+		end
+	end)
+end
+
+ScriptBloxTab:CreateButton({
+	Name = "ðŸ”Ž Search ScriptBlox",
+	Callback = function()
+		searchScriptBlox(currentSearchQuery)
+	end,
+})
+
+ScriptBloxTab:CreateButton({
+	Name = "ðŸŽ® Find Scripts for Current Game",
+	Callback = function()
+		local gameName = "Universal"
+		pcall(function()
+			local info = MarketplaceService:GetProductInfo(game.PlaceId)
+			if info and info.Name then gameName = info.Name end
+		end)
+		searchScriptBlox(gameName)
+	end,
+})
+
+ScriptBloxTab:CreateButton({
+	Name = "âš¡ Run Top Found ScriptBlox Script",
+	Callback = function()
+		if #fetchedScripts > 0 and fetchedScripts[1].script then
+			Rayfield:Notify({ Title = "ScriptBlox", Content = "Executing: " .. fetchedScripts[1].title, Duration = 2 })
+			runCustomScript(fetchedScripts[1].script)
+		else
+			Rayfield:Notify({ Title = "ScriptBlox", Content = "Search for a script first!", Duration = 2 })
+		end
+	end,
+})
+
+ScriptBloxTab:CreateSection("Popular ScriptBlox Hubs")
+
+local scriptBloxPopularHubs = {
+	["Redz Hub (Universal / Blox Fruits)"] = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/realredz/BloxFruits/main/Source.lua"))()',
+	["Hoho Hub (Blox Fruits & Multi)"] = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/acsu123/HOHO_HUB/main/Loading_UI"))()',
+	["Owl Hub (Universal Aim & ESP)"] = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/CriShoux/OwlHub/master/OwlHub.txt"))()',
+	["Ez Hub (Universal)"] = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/debug420/Ez-Hub/main/EZ%20HUB"))()',
+}
+
+for title, hubCode in pairs(scriptBloxPopularHubs) do
+	ScriptBloxTab:CreateButton({
+		Name = "â–¶ï¸ Launch " .. title,
+		Callback = function()
+			scriptTextBox.Text = hubCode
+			runCustomScript(hubCode)
+		end,
+	})
+end
+
+-- ==========================================
+-- ðŸ’» EXECUTOR TAB
+-- ==========================================
+ExecutorTab:CreateSection("Custom Code Runner")
+
+local inputScriptText = ""
+
+ExecutorTab:CreateButton({
+	Name = "ðŸ–¥ï¸ Open Floating In-Game IDE Panel",
+	Callback = function()
+		mainExecFrame.Visible = not mainExecFrame.Visible
+	end,
+})
+
+ExecutorTab:CreateInput({
+	Name = "Single Line / Quick Script",
+	PlaceholderText = "e.g. game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100",
+	RemoveTextAfterFocusLost = false,
+	Callback = function(Text)
+		inputScriptText = Text
+	end,
+})
+
+ExecutorTab:CreateButton({
+	Name = "âš¡ Execute Quick Script",
+	Callback = function()
+		runCustomScript(inputScriptText)
+	end,
+})
+
+ExecutorTab:CreateSection("Script Hub Quick Presets")
+
+local presets = {
+	["Infinite Yield"] = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()',
+	["Dark Dex V3"] = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()',
+	["SimpleSpy V3"] = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/exxtremestuffs/SimpleSpy/master/source.lua"))()',
+	["Nameless Admin"] = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/FilteringEnabled/NamelessAdmin/main/Source"))()',
+	["Universal ESP"] = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/ic3w0lf22/Unnamed-ESP/master/UnnamedESP.lua"))()',
+}
+
+for name, scriptCode in pairs(presets) do
+	ExecutorTab:CreateButton({
+		Name = "â–¶ï¸ Run " .. name,
+		Callback = function()
+			scriptTextBox.Text = scriptCode
+			runCustomScript(scriptCode)
+		end,
+	})
+end
+
+-- ==========================================
+-- ðŸ› ï¸ EXPLOIT DEV TOOLS
+-- ==========================================
+DevToolsTab:CreateSection("Building & Modding Tools")
+
+DevToolsTab:CreateButton({
+	Name = "ðŸ”¨ Give Client BTools (HopperBins)",
+	Callback = function()
+		local backpack = player:FindFirstChildOfClass("Backpack") or player:WaitForChild("Backpack")
+		local tools = {
+			{ Name = "Move Tool", BinType = Enum.BinType.Move },
+			{ Name = "Clone Tool", BinType = Enum.BinType.Clone },
+			{ Name = "Delete Tool", BinType = Enum.BinType.Hammer },
+			{ Name = "Grab Tool", BinType = Enum.BinType.Grab }
+		}
+		for _, t in ipairs(tools) do
+			local bin = Instance.new("HopperBin")
+			bin.Name = t.Name
+			bin.BinType = t.BinType
+			bin.Parent = backpack
+		end
+		Rayfield:Notify({ Title = "BTools", Content = "BTools placed in Backpack!", Duration = 2 })
+	end,
+})
+
+DevToolsTab:CreateButton({
+	Name = "ðŸ§ª Run UNC / Environment Test",
+	Callback = function()
+		Rayfield:Notify({ Title = "UNC Test", Content = "Testing executor environment...", Duration = 2 })
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/unified-naming-convention/NamingStandard/main/UNCCheckEnv.lua"))()
+	end,
+})
+
+-- ==========================================
+-- âš”ï¸ COMBAT SECTION (AIMBOT, REACH, AUTOCLICK)
+-- ==========================================
+CombatTab:CreateSection("Aimbot / CamLock")
+
+local aimbotEnabled = false
+local aimbotSmoothness = 0.5
+local aimbotFOV = 120
+local aimTargetPart = "Head"
+local fovCircleVisible = false
+
+pcall(function()
+	if Drawing and Drawing.new then
+		fovDrawing = Drawing.new("Circle")
+		fovDrawing.Thickness = 1.5
+		fovDrawing.NumSides = 30
+		fovDrawing.Radius = aimbotFOV
+		fovDrawing.Filled = false
+		fovDrawing.Color = currentAccentColor
+		fovDrawing.Visible = false
+	end
+end)
+
+CombatTab:CreateToggle({
+	Name = "Enable CamLock / Aimbot",
+	CurrentValue = false,
+	Flag = "AimbotToggle",
+	Callback = function(Value)
+		aimbotEnabled = Value
+	end,
+})
+
+CombatTab:CreateToggle({
+	Name = "Show FOV Circle",
+	CurrentValue = false,
+	Flag = "FOVCircleToggle",
+	Callback = function(Value)
+		fovCircleVisible = Value
+		if fovDrawing then fovDrawing.Visible = Value end
+	end,
+})
+
+CombatTab:CreateSlider({
+	Name = "FOV Radius",
+	Range = {30, 400},
+	Increment = 5,
+	Suffix = "px",
+	CurrentValue = 120,
+	Flag = "FOVRadiusSlider",
+	Callback = function(Value)
+		aimbotFOV = Value
+		if fovDrawing then fovDrawing.Radius = Value end
+	end,
+})
+
+CombatTab:CreateSlider({
+	Name = "Smoothness",
+	Range = {0.1, 1},
+	Increment = 0.05,
+	Suffix = "Alpha",
+	CurrentValue = 0.5,
+	Flag = "AimbotSmoothnessSlider",
+	Callback = function(Value)
+		aimbotSmoothness = Value
+	end,
+})
+
+CombatTab:CreateDropdown({
+	Name = "Target Part",
+	Options = {"Head", "HumanoidRootPart"},
+	CurrentOption = {"Head"},
+	MultipleOptions = false,
+	Flag = "AimTargetPartDropdown",
+	Callback = function(Option)
+		aimTargetPart = type(Option) == "table" and (Option[1] or "Head") or Option
+	end,
+})
+
+local function getClosestTarget()
+	local closestChar = nil
+	local shortestDist = aimbotFOV
+	local mousePos = UserInputService:GetMouseLocation()
+
+	local candidates = {}
+	for _, p in ipairs(Players:GetPlayers()) do
+		if p ~= player and p.Character then table.insert(candidates, p.Character) end
+	end
+	for _, model in ipairs(Workspace:GetChildren()) do
+		if model:IsA("Model") and model:FindFirstChildOfClass("Humanoid") and not Players:GetPlayerFromCharacter(model) then
+			table.insert(candidates, model)
+		end
+	end
+
+	for _, char in ipairs(candidates) do
+		local part = char:FindFirstChild(aimTargetPart)
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		if part and hum and hum.Health > 0 then
+			local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
+			if onScreen then
+				local dist = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+				if dist < shortestDist then
+					shortestDist = dist
+					closestChar = char
+				end
+			end
+		end
+	end
+	return closestChar
+end
+
+RunService.RenderStepped:Connect(function()
+	if fovDrawing then
+		fovDrawing.Position = UserInputService:GetMouseLocation()
+		fovDrawing.Visible = fovCircleVisible
+	end
+
+	if aimbotEnabled and (UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) or UserInputService:IsKeyDown(Enum.KeyCode.Q)) then
+		local target = getClosestTarget()
+		if target and target:FindFirstChild(aimTargetPart) then
+			local targetPos = target[aimTargetPart].Position
+			local curCF = Camera.CFrame
+			local targetCF = CFrame.new(curCF.Position, targetPos)
+			Camera.CFrame = curCF:Lerp(targetCF, aimbotSmoothness)
+		end
+	end
+end)
+
+CombatTab:CreateSection("Reach & Auto-Clicker")
+
+local reachEnabled = false
+local reachSize = 15
+
+CombatTab:CreateToggle({
+	Name = "Tool Reach / Melee Expander",
+	CurrentValue = false,
+	Flag = "ReachToggle",
+	Callback = function(Value)
+		reachEnabled = Value
+	end,
+})
+
+CombatTab:CreateSlider({
+	Name = "Reach Size",
+	Range = {5, 45},
+	Increment = 1,
+	Suffix = "Studs",
+	CurrentValue = 15,
+	Flag = "ReachSizeSlider",
+	Callback = function(Value)
+		reachSize = Value
+	end,
+})
+
+RunService.Heartbeat:Connect(function()
+	if reachEnabled and player.Character then
+		local tool = player.Character:FindFirstChildOfClass("Tool")
+		if tool then
+			local handle = tool:FindFirstChild("Handle") or tool:FindFirstChildWhichIsA("BasePart")
+			if handle then
+				handle.Size = Vector3.new(reachSize, reachSize, reachSize)
+				handle.Massless = true
+				handle.CanCollide = false
+				handle.Transparency = 0.6
+			end
+		end
+	end
+end)
+
+local autoClicker = false
+local clickDelay = 0.05
+
+CombatTab:CreateToggle({
+	Name = "Fast Auto-Clicker / Tool Activator",
+	CurrentValue = false,
+	Flag = "AutoClickerToggle",
+	Callback = function(Value)
+		autoClicker = Value
+	end,
+})
 
 task.spawn(function()
-    task.wait(1)
-
-    local PlayerGui = t2.value5:FindFirstChild("PlayerGui")
-
-    if not PlayerGui then
-        return
-    end
-
-    for _, child in ipairs(PlayerGui:GetChildren()) do
-        local v31 = child:IsA("ScreenGui")
-
-        if v31 then
-            v31 = child.Name:match("punish")
-        end
-
-        if v31 then
-            child.Name = child.Name:gsub("punishgoat", "ScripterKiddo")
-
-            for _, descendant in pairs(child:GetDescendants()) do
-                local v34 = descendant:IsA("TextLabel")
-
-                if v34 then
-                    v34 = descendant.Text == "Punishment User"
-                end
-
-                if v34 then
-                    descendant.Text = "scripterkiddo user"
-                end
-            end
-        end
-    end
+	while true do
+		if autoClicker and player.Character then
+			local tool = player.Character:FindFirstChildOfClass("Tool")
+			if tool then
+				tool:Activate()
+			else
+				VirtualUser:CaptureController()
+				VirtualUser:ClickButton1(Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2))
+			end
+		end
+		task.wait(clickDelay)
+	end
 end)
 
-local TouchEnabled = t2.value2.TouchEnabled
-if TouchEnabled then
-    TouchEnabled = not t2.value2.KeyboardEnabled
-end
-t1.value7 = TouchEnabled
-if t1.value7 then
-    t1.value4 = Instance.new("ScreenGui")
-    t1.value7 = "Name"
-    t1.value4[t1.value7] = "ScripterkiddoClose"
-    t1.value7 = "ResetOnSpawn"
-    t1.value4[t1.value7] = false
-    t1.value7 = "IgnoreGuiInset"
-    t1.value4[t1.value7] = true
-    t1.value7 = "DisplayOrder"
-    t1.value4[t1.value7] = 1000
-    t1.value7 = "Parent"
-    t1.value4[t1.value7] = v7
-    t1.value5 = Instance.new("TextButton")
-    local value5 = t1.value5
-    t1.value5 = value5
-    t1.value6 = "Size"
-    t1.value8 = UDim2.new(0, 58, 0, 58)
-    t1.value5[t1.value6] = t1.value8
-    t1.value5 = value5
-    t1.value6 = "Position"
-    t1.value8 = UDim2.new(1, -85, 0, 65)
-    t1.value5[t1.value6] = t1.value8
-    t1.value5 = value5
-    t1.value6 = "BackgroundColor3"
-    t1.value8 = Color3.fromRGB(10, 10, 10)
-    t1.value5[t1.value6] = t1.value8
-    t1.value5 = value5
-    t1.value6 = "BackgroundTransparency"
-    t1.value5[t1.value6] = 0.05
-    t1.value5 = value5
-    t1.value6 = "Text"
-    t1.value5[t1.value6] = "S"
-    t1.value5 = value5
-    t1.value6 = "TextColor3"
-    t1.value8 = Color3.fromRGB(255, 255, 255)
-    t1.value5[t1.value6] = t1.value8
-    t1.value5 = value5
-    t1.value6 = "Font"
-    t1.value9 = Enum.Font.GothamBlack
-    t1.value5[t1.value6] = t1.value9
-    t1.value5 = value5
-    t1.value6 = "TextSize"
-    t1.value5[t1.value6] = 26
-    t1.value5 = value5
-    t1.value6 = "AutoButtonColor"
-    t1.value5[t1.value6] = false
-    t1.value5 = value5
-    t1.value6 = "Parent"
-    t1.value5[t1.value6] = t1.value4
-    t1.value6 = Instance.new("UICorner", value5)
-    t1.value5 = "CornerRadius"
-    t1.value8 = UDim.new(1, 0)
-    t1.value6[t1.value5] = t1.value8
-    t1.value6 = Instance.new("UIStroke", value5)
-    local value6 = t1.value6
-    t1.value6 = value6
-    t1.value9 = "Color"
-    t1.value10 = Color3.fromRGB(230, 230, 230)
-    t1.value6[t1.value9] = t1.value10
-    t1.value6 = value6
-    t1.value9 = "Thickness"
-    t1.value6[t1.value9] = 1.6
-    t1.value6 = value6
-    t1.value9 = "Transparency"
-    t1.value6[t1.value9] = 0.2
-    t1.value6 = value5.MouseEnter
-    function t1.value8()
-        t2.value3:Create(value5, TweenInfo.new(0.2), {
-			BackgroundColor3 = Color3.fromRGB(28, 28, 28),
-			TextSize = 28
-		}):Play()
-        t2.value3:Create(value6, TweenInfo.new(0.2), {
-			Color = Color3.fromRGB(255, 255, 255),
-			Transparency = 0,
-			Thickness = 2
-		}):Play()
-    end
-    t1.value6:Connect(t1.value8)
-    t1.value6 = value5.MouseLeave
-    function t1.value8()
-        t2.value3:Create(value5, TweenInfo.new(0.2), {
-			BackgroundColor3 = Color3.fromRGB(10, 10, 10),
-			TextSize = 26
-		}):Play()
-        t2.value3:Create(value6, TweenInfo.new(0.2), {
-			Color = Color3.fromRGB(230, 230, 230),
-			Transparency = 0.2,
-			Thickness = 1.6
-		}):Play()
-    end
-    t1.value6:Connect(t1.value8)
-    local p1Position
-    local value5Position
-    local n1 = 0
-    t1.value10 = value5.InputBegan
-    function t1.value13(p1)
-        local v36 = p1.UserInputType == Enum.UserInputType.Touch
-
-        if not v36 then
-            v36 = p1.UserInputType == Enum.UserInputType.MouseButton1
-        end
-
-        if v36 then
-            n1 = 0
-            p1Position = p1.Position
-            value5Position = value5.Position
-        end
-    end
-    t1.value10:Connect(t1.value13)
-    t1.value10 = value5.InputChanged
-    function t1.value13(p2)
-        if not p1Position then
-            return
-        end
-
-        local v38 = p2.UserInputType == Enum.UserInputType.Touch
-
-        if not v38 then
-            v38 = p2.UserInputType == Enum.UserInputType.MouseMove
-        end
-
-        if v38 then
-            local v39 = p2.Position - p1Position
-
-            n1 = v39.Magnitude
-
-            if n1 > 6 then
-                value5.Position = UDim2.new(value5Position.X.Scale, value5Position.X.Offset + v39.X, value5Position.Y.Scale, value5Position.Y.Offset + v39.Y)
-            end
-        end
-    end
-    t1.value10:Connect(t1.value13)
-    value5.InputEnded:Connect(function(input)
-        local v41 = input.UserInputType == Enum.UserInputType.Touch
-
-        if not v41 then
-            v41 = input.UserInputType == Enum.UserInputType.MouseButton1
-        end
-
-        if v41 and n1 <= 6 then
-            pcall(function()
-                t3.value1:Toggle()
-            end)
-        end
-    end)
-end
-t1.value4 = t3.value1:CreateTab("Home", nil)
-t1.value5 = t3.value1:CreateTab("Reach", nil)
-t1.value7 = t3.value1
-t1.value6 = t1.value7:CreateTab("Xeno Reach", nil)
-t1.value9 = t3.value1:CreateTab("Moss", nil)
-t1.value8 = t3.value1:CreateTab("React", nil)
-t1.value7 = t3.value1
-t3.value2 = nil
-t1.value10 = t1.value7:CreateTab("Xeno Moss", nil)
-t1.value11 = t3.value1:CreateTab("Flags", nil)
-t1.value12 = t3.value1:CreateTab("Extras", nil)
-t1.value13 = t3.value1:CreateTab("Settings", nil)
-t1.value4:CreateSection("Credits")
-t1.value4:CreateParagraph("Made by", "scripterkiddo")
-t1.value4:CreateParagraph("Discord", "discord.gg/q2ZvgAxsre")
-t1.value4:CreateImageParagraph("scripterkiddo tps hub", "Welcome to scripterkiddo tps hub", "rbxassetid://129100470726516")
-t1.value7 = t1.value4.CreateDivider
-t3.value3 = nil
-t1.value7(t1.value4)
-t1.value4:CreateSection("Changelog")
-t1.value4:CreateParagraph("Updates", "â€¢ extras tab added\nâ€¢ everything togglable i hope\nâ€¢ everything improved\nâ€¢ error checks added")
-t3.value4 = nil
-t1.value4:CreateParagraph("Note", "blatant features in Extras.\nuse them when losing badly only.")
-t3.value5 = nil
-t3.value6 = nil
-t3.value7 = nil
-function t1.value16(p3)
-    if not p3 then
-        return
-    end
-
-    t3.value5 = p3
-    t3.value6 = p3:WaitForChild("HumanoidRootPart", 3)
-    t3.value7 = p3:WaitForChild("Humanoid", 3)
-end
-t3.value8 = 0.05
-t3.value9 = 0
-t3.value10 = t1.value16
-t3.value10(t2.value5.Character)
-t2.value5.CharacterAdded:Connect(function(character)
-    task.wait()
-    t3.value10(character)
-end)
-t3.value11 = false
-t3.value12 = 5
-t3.value13 = nil
-t3.value14 = false
-t3.value15 = 10
-t3.value16 = nil
-t3.value17 = 0.05
-t3.value18 = 0
-function t1.value18()
-    if t3.value16 then
-        t3.value16:Disconnect()
-    end
-
-    t3.value16 = t2.value1.PreSimulation:Connect(function()
-        local value5 = t3.value5
-
-        if value5 then
-            value5 = t3.value6 and t3.value7
-        end
-
-        if not value5 then
-            return
-        end
-
-        local TPSSystem = workspace:FindFirstChild("TPSSystem")
-        local v257 = TPSSystem and TPSSystem:FindFirstChild("TPS")
-
-        if not v257 then
-            return
-        end
-
-        if t2.value11() - t3.value18 >= 2 then
-            pcall(function()
-                t3.value17 = t2.value9(t2.value5:GetNetworkPing(), 0.016, 0.2)
-            end)
-        end
-
-        local v258 = t3.value17 + 0.016666666666667
-        local Position = v257.Position
-        local AssemblyLinearVelocity = v257.AssemblyLinearVelocity
-        local value6Position = t3.value6.Position
-        local AssemblyLinearVelocityY = t3.value6.AssemblyLinearVelocity.Y
-
-        if (Position + AssemblyLinearVelocity * v258 - value6Position).Magnitude > t3.value15 then
-            return
-        end
-
-        local v263 = t3.value7.FloorMaterial == Enum.Material.Air
-        local v264 = AssemblyLinearVelocityY > 2
-        local v265 = Position.Y > value6Position.Y + 0.5
-        local v266 = AssemblyLinearVelocity.Y < -3
-
-        if not v264 then
-            v264 = t3.value3 and (v265 and v266)
-
-            if not v264 then
-                v264 = t3.value3 and (not not v263 and v265) or t3.value2
-            end
-        end
-
-        if not v264 then
-            return
-        end
-
-        local t2value5Name = game.Lighting:FindFirstChild(t2.value5.Name)
-
-        if t2value5Name then
-            t2value5Name = t2value5Name:FindFirstChild("PreferredFoot")
-        end
-
-        local v268
-
-        if t3.value7.RigType == Enum.HumanoidRigType.R6 then
-            if t2value5Name then
-                t2value5Name = t2value5Name.Value ~= 1 and "Left Leg" or "Right Leg"
-            end
-
-            v268 = t2value5Name or "Right Leg"
-        else
-            if t2value5Name then
-                t2value5Name = t2value5Name.Value ~= 1 and "LeftLowerLeg" or "RightLowerLeg"
-            end
-
-            v268 = t2value5Name or "RightLowerLeg"
-        end
-
-        local v269 = t3.value5:FindFirstChild(v268)
-
-        pcall(function()
-            if v269 then
-                t2.value7(v257, v269, 0)
-                t2.value7(v257, v269, 1)
-            end
-
-            t2.value7(v257, t3.value6, 0)
-            t2.value7(v257, t3.value6, 1)
-        end)
-    end)
-end
-t3.value3 = true
-t3.value2 = false
-t3.value19 = t1.value18
-t1.value19 = t2.value12(5, 5, 5)
-t3.value20 = t1.value19
-t3.value21 = false
-t3.value22 = nil
-t3.value23 = nil
-t3.value24 = false
-t1.value20 = Instance.new("Part")
-t3.value25 = t1.value20
-t1.value20 = t3.value25
-t1.value23 = "Anchored"
-t1.value20[t1.value23] = true
-t1.value20 = t3.value25
-t1.value23 = "CanCollide"
-t1.value20[t1.value23] = false
-t1.value20 = t3.value25
-t1.value23 = "Transparency"
-t1.value20[t1.value23] = 0.7
-t1.value20 = t3.value25
-t1.value23 = "Color"
-t1.value22 = Color3.fromRGB(0, 85, 255)
-t1.value20[t1.value23] = t1.value22
-t1.value20 = t3.value25
-t1.value23 = "Name"
-t1.value20[t1.value23] = "ScripterkiddoReachPart"
-t1.value20 = t3.value25
-t1.value23 = "Parent"
-t1.value21 = workspace
-t1.value20[t1.value23] = t1.value21
-t3.value26 = nil
-t3.value27 = nil
-t3.value28 = nil
-t3.value29 = nil
-t3.value30 = nil
-t3.value31 = nil
-function t3.value32(p4)
-    if not p4 then
-        return
-    end
-
-    t3.value26 = p4:FindFirstChild("HumanoidRootPart")
-    t3.value27 = p4:FindFirstChild("Humanoid")
-
-    local RightLowerLeg = p4:FindFirstChild("RightLowerLeg")
-
-    if not RightLowerLeg then
-        RightLowerLeg = p4:FindFirstChild("Right Leg")
-    end
-
-    t3.value28 = RightLowerLeg
-
-    local LeftLowerLeg = p4:FindFirstChild("LeftLowerLeg")
-
-    if not LeftLowerLeg then
-        LeftLowerLeg = p4:FindFirstChild("Left Leg")
-    end
-
-    t3.value29 = LeftLowerLeg
-    t3.value30 = t3.value28 ~= nil
-    t3.value31 = t3.value29 ~= nil
-end
-t3.value32(t2.value5.Character)
-
-local CharacterAdded = t2.value5.CharacterAdded
-function t1.value17(p5)
-    task.wait()
-    t3.value32(p5)
-end
-CharacterAdded:Connect(t1.value17)
-t3.value33 = nil
-function t1.value17()
-    local value33 = t3.value33
-
-    if value33 then
-        value33 = t3.value33.Parent
-    end
-
-    if value33 then
-        return t3.value33
-    end
-
-    local TPSSystem = workspace:FindFirstChild("TPSSystem")
-
-    if TPSSystem then
-        TPSSystem = TPSSystem:FindFirstChild("TPS")
-    end
-
-    if not TPSSystem then
-        TPSSystem = workspace:FindFirstChild("Ball")
-    end
-
-    t3.value33 = TPSSystem
-
-    return t3.value33
-end
-t3.value33 = nil
-t3.value34 = t1.value17
-function t3.value35(p6)
-    pcall(function()
-        if t3.value26 then
-            t2.value7(p6, t3.value26, 0)
-            t2.value7(p6, t3.value26, 1)
-        end
-
-        if t3.value30 then
-            t2.value7(p6, t3.value28, 0)
-            t2.value7(p6, t3.value28, 1)
-        end
-
-        if t3.value31 then
-            t2.value7(p6, t3.value29, 0)
-            t2.value7(p6, t3.value29, 1)
-        end
-    end)
-end
-t3.value36 = 8
-t3.value37 = {}
-for i = 1, t3.value36 do
-    local value37 = t3.value37
-    local value13 = t2.value13
-    local value13_2 = t2.value13
-
-    value37[i] = {
-		t = 0,
-		pos = value13,
-		vel = value13_2
-	}
-end
-t3.value38 = 0
-t3.value39 = nil
-t3.value40 = nil
-t3.value40 = 0
-function t3.value41(p7)
-    t3.value38 = t3.value38 % t3.value36 + 1
-
-    local v52 = t3.value37[t3.value38]
-
-    v52.t = t2.value11()
-    v52.pos = p7.Position
-    v52.vel = p7.AssemblyLinearVelocity
-
-    if t3.value40 < t3.value36 then
-        t3.value40 = t3.value40 + 1
-    end
-end
-t3.value42 = nil
-t3.value43 = nil
-function t3.value42(p8)
-    return t3.value37[(t3.value38 - p8 - 1) % t3.value36 + 1]
-end
-function t3.value44(p9, p10)
-    if t3.value40 < 2 then
-        if not p9 then
-            return t2.value13, t2.value13
-        end
-
-        return p9.Position + p9.AssemblyLinearVelocity * p10, p9.AssemblyLinearVelocity
-    end
-
-    local v56 = t3.value42(0)
-    local v57 = t3.value42(1)
-    local v58 = v56.t - v57.t
-
-    if v58 <= 0 then
-        v58 = 0.016
-    end
-
-    local v59 = (v56.pos.X - v57.pos.X) / v58
-    local v60 = (v56.pos.Y - v57.pos.Y) / v58
-    local v61 = (v56.pos.Z - v57.pos.Z) / v58
-    local velX = v56.vel.X
-    local velY = v56.vel.Y
-    local velZ = v56.vel.Z
-    local v65 = velX - v59
-    local v66 = velY - v60
-    local v67 = velZ - v61
-    local v68 = t2.value9((v65 * v65 + v66 * v66 + v67 * v67) / 1225, 0, 1)
-    local v69 = v59 * (1 - v68) + velX * v68
-    local v70 = v60 * (1 - v68) + velY * v68
-    local n2 = 0
-    local v72 = v61 * (1 - v68) + velZ * v68
-    local n3 = 0
-    local n4 = 0
-
-    if t3.value40 >= 3 then
-        local v75 = t3.value42(2)
-        local v76 = v57.t - v75.t
-
-        if v76 > 0 then
-            local v77 = (v57.pos.X - v75.pos.X) / v76
-            local v78 = (v57.pos.Y - v75.pos.Y) / v76
-            local v79 = (v57.pos.Z - v75.pos.Z) / v76
-
-            n3 = t2.value9((v59 - v77) / v58, -120, 120)
-            n4 = t2.value9((v60 - v78) / v58, -120, 120)
-            n2 = t2.value9((v61 - v79) / v58, -120, 120)
-        end
-    end
-
-    local v80 = -9.8 * p10 * p10 * (1 - v68)
-    local v81 = t2.value9(p10, 0.016, 0.25)
-    local v82 = 0.5 * v81 * v81
-
-    return t2.value12(v56.pos.X + v69 * v81 + n3 * v82, v56.pos.Y + v70 * v81 + n4 * v82 + v80, v56.pos.Z + v72 * v81 + n2 * v82), t2.value12(v69, v70, v72)
-end
-t3.value45 = 0.05
-t3.value46 = 0
-t3.value47 = 0.1
-t3.value39 = -0.0013611111111111
-t3.value43 = 5
-t3.value48 = nil
-function t3.value48()
-    if not t3.value26 or not t3.value27 then
-        return
-    end
-
-    local v83 = t3.value34()
-
-    if not v83 then
-        return
-    end
-
-    if t2.value11() - t3.value46 >= 2 then
-        pcall(function()
-            t3.value45 = t2.value9(t2.value5:GetNetworkPing(), 0.016, 0.25)
-        end)
-    end
-
-    local Position = v83.Position
-    local value26Position = t3.value26.Position
-    local v86 = Position.X - value26Position.X
-    local v87 = Position.Z - value26Position.Z
-
-    if t2.value8(v86) > 32 or t2.value8(v87) > 32 then
-        return
-    end
-
-    t3.value41(v83)
-
-    local v88 = Position.Y - value26Position.Y
-    local v89 = v88 * v88
-    local v90 = v86 * v86 + v89
-    local v91 = t2.value10(v90 + v87 * v87)
-    local v92 = t3.value45 + 0.016666666666667
-    local v93
-
-    if t3.value45 >= t3.value47 or v91 >= 7 then
-        Position, v93 = t3.value44(v83, v92)
-    else
-        v93 = v83.AssemblyLinearVelocity
-    end
-
-    local X = v93.X
-    local Y = v93.Y
-    local Z = v93.Z
-    local v97 = t2.value12(Position.X + X * 0.016666666666667, Position.Y + Y * 0.016666666666667 + t3.value39, Position.Z + Z * 0.016666666666667)
-    local v98 = t3.value20.X / 2
-    local v99 = t3.value20.Y / 2
-    local v100 = t3.value20.Z / 2
-    local v101 = Position.X - value26Position.X
-    local v102 = Position.Y - value26Position.Y
-    local v103 = Position.Z - value26Position.Z
-    local v104 = v97.X - value26Position.X
-    local v105 = v97.Y - value26Position.Y
-    local v106 = v97.Z - value26Position.Z
-
-    if v91 < t3.value43 then
-        t3.value35(v83)
-    end
-
-    local v107 = v98 >= t2.value8(v101)
-
-    if v107 then
-        v107 = v99 >= t2.value8(v102) and v100 >= t2.value8(v103)
-    end
-
-    if not v107 then
-        v107 = v98 >= t2.value8(v104)
-
-        if v107 then
-            v107 = v99 >= t2.value8(v105) and v100 >= t2.value8(v106)
-        end
-    end
-
-    if v107 then
-        t3.value35(v83)
-    end
-
-    if not t3.value24 and t3.value26 then
-        pcall(function()
-            t3.value25.CFrame = t3.value26.CFrame
-        end)
-    end
-end
-function t3.value49()
-    if t3.value22 then
-        t3.value22:Disconnect()
-    end
-
-    if t3.value23 then
-        t3.value23:Disconnect()
-    end
-
-    t3.value25.Size = t3.value20
-    t3.value22 = t2.value1.PreSimulation:Connect(t3.value48)
-    t3.value23 = t2.value1.Stepped:Connect(t3.value48)
-end
-local function v24()
-    if t3.value22 then
-        t3.value22:Disconnect()
-    end
-
-    if t3.value23 then
-        t3.value23:Disconnect()
-    end
-
-    pcall(function()
-        t3.value25.CFrame = CFrame.new(0, -9999, 0)
-    end)
-end
-t1.value5:CreateSection("Method 1  (not Xeno/Solara)")
-
-if v9 then
-    t1.value5:CreateLabel("WARNING: ur on Xeno/Solara â€” use Xeno Reach tab instead")
-end
-t1.value5:CreateLabel("hi.")
-t1.value5:CreateToggle("Enable Reach M1", "fires leg touch on ball entry", false, function(p11)
-    t3.value11 = p11
-
-    if not p11 and t3.value13 then
-        t3.value13:Disconnect()
-
-        return
-    end
-
-    if t3.value13 then
-        t3.value13:Disconnect()
-    end
-
-    t3.value13 = t2.value1.PreSimulation:Connect(function()
-        local value5 = t3.value5
-
-        if value5 then
-            value5 = t3.value6 and t3.value7
-        end
-
-        if not value5 then
-            return
-        end
-
-        local TPSSystem = workspace:FindFirstChild("TPSSystem")
-
-        if TPSSystem then
-            TPSSystem = TPSSystem:FindFirstChild("TPS")
-        end
-
-        local v272 = TPSSystem
-
-        if not v272 then
-            return
-        end
-
-        if t2.value11() - t3.value9 >= 2 then
-            pcall(function()
-                t3.value8 = t2.value9(t2.value5:GetNetworkPing(), 0.016, 0.2)
-            end)
-        end
-
-        local v273 = t3.value8 + 0.016666666666667
-        local v274 = v272.Position + v272.AssemblyLinearVelocity * v273
-
-        if (t3.value6.Position - v274).Magnitude > t3.value12 then
-            return
-        end
-
-        local t2value5Name = game.Lighting:FindFirstChild(t2.value5.Name)
-        local v276 = t2value5Name and t2value5Name:FindFirstChild("PreferredFoot")
-
-        if not v276 then
-            return
-        end
-
-        local v277 = if t3.value7.RigType ~= Enum.HumanoidRigType.R6 then v276.Value ~= 1 and "LeftLowerLeg" or "RightLowerLeg" else v276.Value ~= 1 and "Left Leg" or "Right Leg"
-        local v278 = t3.value5:FindFirstChild(v277)
-
-        if v278 then
-            pcall(function()
-                t2.value7(v278, v272, 0)
-                t2.value7(v278, v272, 1)
-            end)
-        end
-    end)
-end)
-
-function t1.value25(p12)
-    if not tonumber(p12) then
-        local _ = t3.value12
-    end
-
-    if t3.value11 then
-        if t3.value13 then
-            t3.value13:Disconnect()
-        end
-
-        t3.value13 = t2.value1.PreSimulation:Connect(function()
-            local value5 = t3.value5
-
-            if value5 then
-                value5 = t3.value6 and t3.value7
-            end
-
-            if not value5 then
-                return
-            end
-
-            local TPSSystem = workspace:FindFirstChild("TPSSystem")
-
-            if TPSSystem then
-                TPSSystem = TPSSystem:FindFirstChild("TPS")
-            end
-
-            local v281 = TPSSystem
-
-            if not v281 then
-                return
-            end
-
-            if t2.value11() - t3.value9 >= 2 then
-                pcall(function()
-                    t3.value8 = t2.value9(t2.value5:GetNetworkPing(), 0.016, 0.2)
-                end)
-            end
-
-            local v282 = t3.value8 + 0.016666666666667
-            local v283 = v281.Position + v281.AssemblyLinearVelocity * v282
-
-            if (t3.value6.Position - v283).Magnitude > t3.value12 then
-                return
-            end
-
-            local t2value5Name = game.Lighting:FindFirstChild(t2.value5.Name)
-            local v285 = t2value5Name and t2value5Name:FindFirstChild("PreferredFoot")
-
-            if not v285 then
-                return
-            end
-
-            local v286 = if t3.value7.RigType ~= Enum.HumanoidRigType.R6 then v285.Value ~= 1 and "LeftLowerLeg" or "RightLowerLeg" else v285.Value ~= 1 and "Left Leg" or "Right Leg"
-            local v287 = t3.value5:FindFirstChild(v286)
-
-            if v287 then
-                pcall(function()
-                    t2.value7(v287, v281, 0)
-                    t2.value7(v287, v281, 1)
-                end)
-            end
-        end)
-    end
-end
-t1.value5:CreateInput("Reach Size", "enter number", "Default: 5", nil, nil, t1.value25)
-t1.value5:CreateDivider()
-t1.value5:CreateSection("Volley Reach  (not Xeno/Solara)")
-t1.value5:CreateLabel("weird but rlly fast downward volley")
-t1.value5:CreateToggle("Enable Volley Reach", "ping-aware aerial volley reach", false, function(p13)
-    t3.value14 = p13
-
-    if not p13 and t3.value16 then
-        t3.value16:Disconnect()
-
-        return
-    end
-
-    t3.value19()
-end)
-t1.value5:CreateSlider("Reach Radius", 3, 30, 12, function(p14)
-    t3.value15 = p14
-
-    if t3.value14 then
-        t3.value19()
-    end
-end)
-t1.value5:CreateToggle("Downward Volley", "fire when ball descends above you", true, function(p15)
-    t3.value3 = p15
-end)
-t1.value5:CreateToggle("Ground Mode", "can reach on the ground too", false, function(p16)
-    t3.value2 = p16
-end)
-t1.value5:CreateDivider()
-t1.value5:CreateSection("Method 2  (not Xeno/Solara)")
-t1.value5:CreateLabel("Box reach | smartPredict + gravity + dual-frame check.")
-
-local v25 = t1.value5:CreateDropdown("Shape")
-
-v25:CreateButton("Box", "Block hitbox", nil, function()
-    t3.value25.Shape = Enum.PartType.Block
-
-    if t3.value21 then
-        t3.value49()
-    end
-end)
-v25:CreateButton("Sphere", "Ball hitbox", nil, function()
-    t3.value25.Shape = Enum.PartType.Ball
-
-    if t3.value21 then
-        t3.value49()
-    end
-end)
-v25:CreateButton("Cylinder", "Cylinder hitbox", nil, function()
-    t3.value25.Shape = Enum.PartType.Cylinder
-
-    if t3.value21 then
-        t3.value49()
-    end
-end)
-t1.value5:CreateToggle("Enable Reach M2", "hitbox box reach with prediction", false, function(p17)
-    t3.value21 = p17
-
-    if p17 then
-        t3.value49()
-
-        return
-    end
-
-    v24()
-end)
-t1.value5:CreateSlider("Reach X", 1, 50, 5, function(p18)
-    t3.value20 = t2.value12(p18, t3.value20.Y, t3.value20.Z)
-    t3.value25.Size = t3.value20
-
-    if t3.value21 then
-        t3.value49()
-    end
-end)
-t1.value5:CreateSlider("Reach Y", 1, 50, 5, function(p19)
-    t3.value20 = t2.value12(t3.value20.X, p19, t3.value20.Z)
-    t3.value25.Size = t3.value20
-
-    if t3.value21 then
-        t3.value49()
-    end
-end)
-t1.value5:CreateSlider("Reach Z", 1, 50, 5, function(p20)
-    t3.value20 = t2.value12(t3.value20.X, t3.value20.Y, p20)
-    t3.value25.Size = t3.value20
-
-    if t3.value21 then
-        t3.value49()
-    end
-end)
-t1.value5:CreateInput("Sync X Y Z", "set all axes at once", "Enter number", nil, nil, function(p21)
-    local num = tonumber(p21)
-
-    if num then
-        t3.value20 = t2.value12(num, num, num)
-        t3.value25.Size = t3.value20
-
-        if t3.value21 then
-            t3.value49()
-        end
-    end
-end)
-t1.value5:CreateToggle("Hide Box", "make the reach box invisible", false, function(p22)
-    t3.value24 = p22
-
-    if p22 then
-        pcall(function()
-            t3.value25.CFrame = CFrame.new(0, -9999, 0)
-        end)
-        t3.value25.Transparency = 1
-
-        return
-    end
-
-    t3.value25.Transparency = t3.value4
-end)
-t3.value50 = false
-t3.value51 = "Right Leg"
-t3.value52 = t2.value12(10, 10, 10)
-t3.value53 = nil
-t3.value54 = 0
-t3.value55 = 0.05
-t1.value24 = Instance.new("Part")
-t3.value56 = t1.value24
-t1.value24 = t3.value56
-t1.value28 = "Anchored"
-t1.value24[t1.value28] = true
-t1.value24 = t3.value56
-t1.value28 = "CanCollide"
-t1.value24[t1.value28] = false
-t1.value24 = t3.value56
-t1.value28 = "Transparency"
-t1.value24[t1.value28] = 0.5
-t1.value24 = t3.value56
-t1.value28 = "Material"
-t1.value26 = Enum.Material.Neon
-t1.value24[t1.value28] = t1.value26
-t1.value24 = t3.value56
-t1.value28 = "Color"
-t1.value27 = Color3.fromRGB(255, 0, 0)
-t1.value24[t1.value28] = t1.value27
-t1.value24 = t3.value56
-t1.value28 = "Size"
-t1.value24[t1.value28] = t3.value52
-t1.value24 = t3.value56
-t1.value28 = "CFrame"
-t1.value27 = CFrame.new(0, -9999, 0)
-t1.value24[t1.value28] = t1.value27
-t1.value24 = t3.value56
-t1.value28 = "Parent"
-t1.value26 = workspace
-t1.value24[t1.value28] = t1.value26
-function t1.value28()
-    local t2value5Name = game:GetService("Lighting"):FindFirstChild(t2.value5.Name)
-
-    if t2value5Name then
-        local PreferredFoot = t2value5Name:FindFirstChild("PreferredFoot")
-        local v124 = PreferredFoot
-
-        if PreferredFoot then
-            v124 = PreferredFoot:IsA("IntValue")
-        end
-
-        if v124 then
-            t3.value51 = PreferredFoot.Value ~= 1 and "Left Leg" or "Right Leg"
-        end
-    end
-end
-function t1.value26(p23)
-
-    for v128, v129 in p23:GetDescendants() do
-
-        local v130 = v129
-        local v131 = v130:IsA("Motor6D")
-
-        if v131 then
-            v131 = v130.Name:find("Fake")
-        end
-
-        if v131 then
-            pcall(function()
-                v130:Destroy()
-            end)
-        end
-    end
-    local Torso = p23:FindFirstChild("Torso")
-    if not Torso then
-        return
-    end
-    local v133 = p23:FindFirstChild("Right Leg")
-    local v134 = p23:FindFirstChild("Left Leg")
-    if v133 then
-        v133.Transparency = 1
-        v133.Massless = true
-    end
-    if v134 then
-        v134.Transparency = 1
-        v134.Massless = true
-    end
-    local Part = Instance.new("Part")
-    Part.Name = "Left Leg"
-    Part.Size = t2.value12(1, 2, 1)
-    local v136 = v134 and v134.Color
-    if not v136 then
-        v136 = Color3.fromRGB(200, 200, 200)
-    end
-    Part.Color = v136
-    Part.CanCollide = false
-    Part.Locked = true
-    Part.Parent = p23
-    local Motor6D = Instance.new("Motor6D")
-    Motor6D.Name = "Fake Left Hip"
-    Motor6D.Part0 = Torso
-    Motor6D.Part1 = Part
-    Motor6D.C0 = CFrame.new(-1, -1, 0) * CFrame.Angles(0, -1.5707963267948966, 0)
-    Motor6D.C1 = CFrame.new(-0.5, 1, 0) * CFrame.Angles(0, -1.5707963267948966, 0)
-    Motor6D.Parent = Torso
-    local Part2 = Instance.new("Part")
-    Part2.Name = "Right Leg"
-    Part2.Size = t2.value12(1, 2, 1)
-    local v139 = v133 and v133.Color
-    if not v139 then
-        v139 = Color3.fromRGB(200, 200, 200)
-    end
-    Part2.Color = v139
-    Part2.CanCollide = false
-    Part2.Locked = true
-    Part2.Parent = p23
-    local Motor6D2 = Instance.new("Motor6D")
-    Motor6D2.Name = "Fake Right Hip"
-    Motor6D2.Part0 = Torso
-    Motor6D2.Part1 = Part2
-    Motor6D2.C0 = CFrame.new(1, -1, 0) * CFrame.Angles(0, 1.5707963267948966, 0)
-    Motor6D2.C1 = CFrame.new(0.5, 1, 0) * CFrame.Angles(0, 1.5707963267948966, 0)
-    Motor6D2.Parent = Torso
-end
-t3.value57 = t1.value28
-t3.value58 = t1.value26
-t1.value6:CreateSection("Xeno & Solara Reach")
-t1.value6:CreateLabel("Moves your leg to the ball when it enters the hitbox.")
-t1.value6:CreateToggle("Enable Xeno Reach", "leg teleports to ball on contact", false, function(p24)
-    t3.value50 = p24
-
-    if t3.value53 then
-        t3.value53:Disconnect()
-    end
-
-    if not p24 then
-        pcall(function()
-            t3.value56.CFrame = CFrame.new(0, -9999, 0)
-        end)
-
-        return
-    end
-
-    t3.value57()
-
-    local Character = t2.value5.Character
-
-    if not Character then
-        Character = t2.value5.CharacterAdded:Wait()
-    end
-
-    local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart", 3)
-    local v144 = t3.value51 ~= "Right Leg" and "Left" or "Right"
-    local v145 = Character:FindFirstChild(v144 .. " Hip", true)
-
-    if not v145 then
-        v145 = Character:FindFirstChild(v144 .. "Hip", true)
-    end
-
-    local v146 = v145
-    local v147 = v146
-
-    if v147 then
-        v147 = v146:IsA("Motor6D")
-    end
-
-    if v147 then
-        pcall(function()
-            v146:Destroy()
-        end)
-    end
-
-    t3.value58(Character)
-
-    local t3value51 = Character:FindFirstChild(t3.value51)
-
-    if not t3value51 then
-        t3value51 = Character:FindFirstChild("RightLowerLeg")
-
-        if not t3value51 then
-            t3value51 = Character:FindFirstChild("LeftLowerLeg")
-        end
-    end
-
-    local v149 = t3value51
-
-    t3.value54 = 0
-    t2.value1.RenderStepped:Connect(function()
-        if tick() - t3.value54 < t3.value55 then
-            return
-        end
-        local value50 = t3.value50
-        if value50 then
-            value50 = HumanoidRootPart and v149
-        end
-        if not value50 then
-            return
-        end
-        t3.value56.Size = t3.value52
-        pcall(function()
-            t3.value56.CFrame = HumanoidRootPart.CFrame
-        end)
-        local TPS
-        local TPSSystem = workspace:FindFirstChild("TPSSystem")
-        if TPSSystem then
-            TPS = TPSSystem:FindFirstChild("TPS")
-        end
-        if not TPS then
-            local Balls = workspace:FindFirstChild("Balls")
-
-            if Balls then
-                TPS = Balls:FindFirstChildWhichIsA("BasePart")
-            end
-        end
-        if not TPS then
-            return
-        end
-        local v292 = TPS.Position + TPS.Velocity * 0.001
-        local v293 = v292 - HumanoidRootPart.Position
-        local v294 = t3.value52.X * 0.5
-        local v295 = t3.value52.Y * 0.5
-        local v296 = t3.value52.Z * 0.5
-        local v297 = v294 >= t2.value8(v293.X)
-        if v297 then
-            v297 = v295 >= t2.value8(v293.Y)
-
-            if v297 then
-                v297 = v296 >= t2.value8(v293.Z)
-            end
-        end
-        if v297 then
-            pcall(function()
-                v149.CFrame = CFrame.new(v292) * CFrame.new(0, -0.6, 0)
-            end)
-        end
-    end)
-end)
-t1.value26 = t1.value6:CreateDropdown("Leg")
-t1.value26:CreateButton("Right Leg", "use right leg", nil, function()
-end)
-t1.value26:CreateButton("Left Leg", "use left leg", nil, function()
-end)
-t1.value6:CreateSlider("Box Size X", 0, 30, 10, function(p25)
-    t3.value52 = t2.value12(p25, t3.value52.Y, t3.value52.Z)
-    t3.value56.Size = t3.value52
-end)
-
-function t1.value29(p26)
-    t3.value52 = t2.value12(t3.value52.X, p26, t3.value52.Z)
-    t3.value56.Size = t3.value52
-end
-t1.value6:CreateSlider("Box Size Y", 0, 30, 10, t1.value29)
-t1.value6:CreateSlider("Box Size Z", 0, 30, 10, function(p27)
-    t3.value52 = t2.value12(t3.value52.X, t3.value52.Y, p27)
-    t3.value56.Size = t3.value52
-end)
-t1.value6:CreateDivider()
-t1.value6:CreateSection("Visual & Cosmetics")
-t1.value6:CreateInput("Box Transparency", "0 = solid, 1 = invisible", "0.5", nil, nil, function(p28)
-    t3.value56.Transparency = tonumber(p28) or 0.5
-end)
-t1.value6:CreateToggle("Appear Normal Legs", "re-create fake legs to look normal", false, function(p29)
-    if not p29 then
-        return
-    end
-
-    local Character = t2.value5.Character
-
-    if not Character then
-        Character = t2.value5.CharacterAdded:Wait()
-    end
-
-    local Humanoid = Character:WaitForChild("Humanoid", 3)
-
-    if not Humanoid then
-        return
-    end
-
-    if Humanoid.RigType == Enum.HumanoidRigType.R6 then
-        t3.value58(Character)
-
-        return
-    end
-
-    if Humanoid.RigType == Enum.HumanoidRigType.R15 then
-        if Character:FindFirstChild("RightLowerLeg") then
-            Character.RightLowerLeg.Transparency = 1
-        end
-
-        if Character:FindFirstChild("LeftLowerLeg") then
-            Character.LeftLowerLeg.Transparency = 1
-        end
-    end
-end)
-t3.value59 = false
-t3.value60 = nil
-local function v26(p30, p31, p32, p33, p34, p35)
-    if t3.value60 then
-        t3.value60:Disconnect()
-        t3.value60 = nil
-    end
-    local Head
-    local u164
-    local u165 = false
-    local n5 = 0.05
-    local function v167(p36)
-        return p36:gsub("^DFInt", ""):gsub("^DFFlag", ""):gsub("FString", ""):gsub("FLog", ""):gsub("^FFlag", ""):gsub("^DFint", ""):gsub("^FInt", "")
-    end
-    local function v168(p37)
-        if not setfflag then
-            return
-        end
-
-        pcall(function()
-            local v383 = v167("DFIntTargetTimeDelayFacctorTenths")
-
-            if getfflag(v383) ~= nil then
-                setfflag(v383, p37)
-
-                return
-            end
-
-            if getfflag("DFIntTargetTimeDelayFacctorTenths") ~= nil then
-                setfflag("DFIntTargetTimeDelayFacctorTenths", p37)
-            end
-        end)
-    end
-    task.spawn(function()
-        while true do
-            v168(p30)
-
-            local v301 = p32
-
-            if setfflag then
-                pcall(function()
-                    local v385 = v167("FIntInterpolationMaxDelayMSec")
-
-                    if getfflag(v385) ~= nil then
-                        setfflag(v385, v301)
-
-                        return
-                    end
-
-                    if getfflag("FIntInterpolationMaxDelayMSec") ~= nil then
-                        setfflag("FIntInterpolationMaxDelayMSec", v301)
-                    end
-                end)
-            end
-
-            task.wait(20)
-        end
-    end)
-    local Character = t2.value5.Character
-    if Character then
-        Head = Character:FindFirstChild("Head")
-    end
-    t2.value5.CharacterAdded:Connect(function(character)
-        task.wait()
-
-        if not character then
-            return
-        end
-
-        Head = character:FindFirstChild("Head")
-    end)
-    local function v170()
-        local v304 = u164
-
-        if v304 then
-            v304 = u164.Parent
-        end
-
-        if v304 then
-            return u164
-        end
-
-        local TPSSystem = workspace:FindFirstChild("TPSSystem")
-
-        if TPSSystem then
-            TPSSystem = TPSSystem:FindFirstChild("TPS")
-        end
-
-        if not TPSSystem then
-            TPSSystem = workspace:FindFirstChild("Ball")
-        end
-
-        u164 = TPSSystem
-
-        return u164
-    end
-    t3.value60 = t2.value1.PreSimulation:Connect(function()
-        if not t3.value59 then
-            return
-        end
-
-        if not Head then
-            return
-        end
-
-        local v306 = v170()
-
-        if not v306 then
-            return
-        end
-
-        local Position = v306.Position
-        local HeadPosition = Head.Position
-
-        if t2.value11() - 0 >= 2 then
-            pcall(function()
-                n5 = t2.value9(t2.value5:GetNetworkPing(), 0.016, 0.15)
-            end)
-        end
-
-        local v309 = n5 + 0.016666666666667
-        local AssemblyLinearVelocity = v306.AssemblyLinearVelocity
-        local v311 = Position.X + AssemblyLinearVelocity.X * v309
-        local v312 = Position.Y + AssemblyLinearVelocity.Y * v309
-        local v313 = Position.Z + AssemblyLinearVelocity.Z * v309
-        local v314 = v311 - HeadPosition.X
-        local v315 = v312 - HeadPosition.Y
-        local v316 = v313 - HeadPosition.Z
-        local v317 = v314 >= -p33
-
-        if v317 then
-            v317 = v314 <= p33
-
-            if v317 then
-                v317 = v316 >= -p34
-
-                if v317 then
-                    v317 = v316 <= p34
-
-                    if v317 then
-                        v317 = v315 >= 1 and v315 <= p35
-                    end
-                end
-            end
-        end
-
-        if v317 then
-            pcall(function()
-                t2.value7(v306, Head, 0)
-                t2.value7(v306, Head, 1)
-            end)
-
-            if not u165 then
-                u165 = true
-                v168(p31)
-
-                return
-            end
-        elseif u165 then
-            v168(p30)
-        end
-    end)
-end
-t1.value9:CreateSection("Head Reach & Moss")
-
-if v9 then
-    t1.value9:CreateLabel("WARNING: ur on Xeno/Solara â€” use Xeno Moss tab instead")
-end
-t1.value9:CreateLabel("Enable first, then select intensity. Ping-aware prediction.")
-t1.value9:CreateToggle("Enable Moss", "activates head reach / moss", false, function(p38)
-    t3.value59 = p38
-
-    if not p38 and t3.value60 then
-        t3.value60:Disconnect()
-    end
-end)
-
-function t1.value30()
-    v26("13", "9", "90", 2.5, 1.5, 3)
-end
-t1.value9:CreateButton("Moss 15%  â€” kinda obv", "safest, highest delay", nil, t1.value30)
-t1.value9:CreateButton("Moss 25%  â€” unmossable", "hard to moss back", nil, function()
-    v26("12", "8", "85", 2.7, 1.7, 3.4)
-end)
-
-function t1.value30()
-    v26("10", "6", "75", 3.1, 2.3, 4.2)
-end
-t1.value9:CreateButton("Moss 50%  â€” barely mossable", "balanced", nil, t1.value30)
-t1.value9:CreateButton("Moss 75%  â€” not mossable", "aggressive", nil, function()
-    v26("8", "3", "67", 3.6, 2.9, 5.1)
-end)
-t1.value9:CreateButton("Moss 100% â€” blatant", "most aggressive, noticeable", nil, function()
-    v26("6", "0", "60", 4, 3.5, 6)
-end)
-t1.value9:CreateDivider()
-t1.value9:CreateSection("Info")
-t1.value9:CreateParagraph("How Moss Works", "made by scripterkiddo.\nrlly good if used with smart config")
-t1.value9:CreateParagraph("15% â€” 100%", "15% = safest (highest delay)\n100% = most aggressive (rlly broken)")
-t3.value61 = false
-t3.value62 = nil
-t3.value63 = "13"
-t3.value64 = "90"
-local function v27(p39, p40)
-    local function v174(p41)
-        return p41:gsub("^DFInt", ""):gsub("^DFFlag", ""):gsub("FString", ""):gsub("FLog", ""):gsub("^FFlag", ""):gsub("^DFint", ""):gsub("^FInt", "")
-    end
-
-    t3.value63 = p39
-    t3.value64 = p40
-
-    if t3.value62 then
-        task.cancel(t3.value62)
-        t3.value62 = nil
-    end
-
-    if not t3.value61 then
-        return
-    end
-
-    local t4 = {
-		DFIntTargetTimeDelayFacctorTenths = p39,
-		FIntInterpolationMaxDelayMSec = p40
-	}
-
-    t3.value62 = task.spawn(function()
-        while true do
-            (function()
-                if not setfflag then
-                    return
-                end
-
-                for k, v in pairs(t4) do
-                    local v388 = v
-                    local v389 = v174(k)
-
-                    pcall(function()
-                        if getfflag(v389) ~= nil then
-                            setfflag(v389, v388)
-
-                            return
-                        end
-
-                        if getfflag(k) ~= nil then
-                            setfflag(k, v388)
-                        end
-                    end)
-                end
-            end)()
-            task.wait(20)
-        end
-    end)
-end
-t1.value8:CreateSection("React")
-t1.value8:CreateLabel("Enable first, then pick level.")
-t1.value8:CreateToggle("Enable React", "activates flag-based react", false, function(p42)
-    t3.value61 = p42
-
-    if not p42 then
-        if t3.value62 then
-            task.cancel(t3.value62)
-
-            return
-        end
-    else
-        v27(t3.value63, t3.value64)
-    end
-end)
-
-function t1.value34()
-    v27("13", "90")
-end
-t1.value8:CreateButton("React 15%  â€” not obv at all", "safest react level", nil, t1.value34)
-t1.value8:CreateButton("React 25%  â€” not obv", "light react", nil, function()
-    v27("12", "85")
-end)
-t1.value8:CreateButton("React 50%  â€” balanced", "mid react", nil, function()
-    v27("10", "75")
-end)
-t1.value8:CreateButton("React 75%  â€” Aggressive", "high react", nil, function()
-    v27("8", "67")
-end)
-
-function t1.value34()
-    v27("6", "70")
-end
-t1.value8:CreateButton("React 100% â€” Maximum", "max react, noticeable", nil, t1.value34)
-t1.value8:CreateDivider()
-t1.value8:CreateSection("Note")
-t1.value8:CreateParagraph("React vs Moss", "made by scripterkiddo.\nreact is basically for heading faster.")
-t3.value65 = nil
-t3.value66 = false
-function t1.value33(p43, p44, p45)
-    if t3.value65 then
-        t3.value65:Disconnect()
-        t3.value65 = nil
-    end
-    if not t3.value66 then
-        return
-    end
-    local function v180(p46, p47, p48, p49)
-        local v323 = p46.Position - p47 / 2
-        local v324 = p46.Position + p47 / 2
-        local v325 = p48.Position - p49 / 2
-        local v326 = p48.Position + p49 / 2
-        local v327 = v323.X <= v326.X
-
-        if v327 then
-            v327 = v324.X >= v325.X
-        end
-
-        if v327 then
-            v327 = v323.Y <= v326.Y
-
-            if v327 then
-                v327 = v324.Y >= v325.Y
-            end
-
-            if v327 then
-                v327 = v323.Z <= v326.Z
-
-                if v327 then
-                    v327 = v324.Z >= v325.Z
-                end
-            end
-        end
-
-        return v327
-    end
-    local Animation = Instance.new("Animation")
-    Animation.AnimationId = "rbxassetid://301501585"
-    local track
-    local function v183()
-        local Character = t2.value5.Character
-
-        if not Character then
-            return
-        end
-
-        local Humanoid = Character:FindFirstChildOfClass("Humanoid")
-
-        if Humanoid then
-            local Animator = Humanoid:FindFirstChildOfClass("Animator")
-
-            if not Animator then
-                Animator = Instance.new("Animator", Humanoid)
-            end
-
-            Humanoid = Animator
-        end
-
-        local v331 = Humanoid
-
-        if not v331 then
-            return
-        end
-
-        local v332 = track
-
-        if v332 then
-            v332 = track.IsPlaying
-        end
-
-        if v332 then
-            return
-        end
-
-        pcall(function()
-            track = v331:LoadAnimation(Animation)
-            track:Play()
-        end)
-    end
-    local function v184()
-        local TPSSystem = workspace:FindFirstChild("TPSSystem")
-
-        if TPSSystem then
-            TPSSystem = TPSSystem:FindFirstChild("TPS")
-        end
-
-        local v334 = TPSSystem
-
-        if not v334 then
-            return
-        end
-
-        local FE = workspace:FindFirstChild("FE")
-
-        if FE then
-            local System = FE:FindFirstChild("System")
-
-            if System then
-                System = FE.System:FindFirstChild("Header")
-            end
-
-            FE = System
-        end
-
-        local v337 = FE
-
-        if not v337 then
-            return
-        end
-
-        pcall(function()
-            v337:FireServer(t2.value5.UserId, v334, "Rock'n'roll Star", "NeverFearTruth", "power=95/100")
-        end)
-    end
-    t3.value65 = t2.value1.Heartbeat:Connect(function()
-        if not t3.value66 then
-            return
-        end
-        local Character = t2.value5.Character
-        if not Character then
-            return
-        end
-        local Head = Character:FindFirstChild("Head")
-        if not Head then
-            return
-        end
-        local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
-        if not HumanoidRootPart then
-            return
-        end
-        local v341 = Head.CFrame * CFrame.new(0, 1.5, 0)
-        local v342 = t2.value12(p43, p44, p45)
-        local t5 = {}
-        local Balls = workspace:FindFirstChild("Balls")
-        local g354
-        if Balls then
-            for _, child in Balls:GetChildren() do
-                if child:IsA("BasePart") then
-                    table.insert(t5, child)
-                end
-            end
-        end
-        local TPSSystem = workspace:FindFirstChild("TPSSystem")
-        if TPSSystem then
-            for _, child in TPSSystem:GetChildren() do
-                local v350 = child:IsA("BasePart")
-
-                if not v350 then
-                    v350 = child.Name == "TPS"
-                end
-
-                if v350 then
-                    table.insert(t5, child)
-                end
-            end
-        end
-        local v351
-        local v352 = false
-        repeat
-            local v353
-
-            v351, v353 = t5(nil, v351)
-
-            if not v351 then
-                g354 = true
-            end
-
-            if g354 then
-                break
-            end
-
-            local v355 = v353.Position + v353.Velocity * 0.001
-            local v356 = CFrame.new(v355) * v353.CFrame.Rotation
-        until v353.Position.Y >= HumanoidRootPart.Position.Y + 1 and v180(v341, v342, v356, v353.Size)
-        if not g354 then
-            v352 = true
-        end
-        g354 = false
-        if v352 then
-            v352 = true
-        end
-        if v352 then
-            v183()
-            v184()
-            task.delay(0.3, function()
-            end)
-        end
-    end)
-end
-t3.value65 = nil
-t3.value67 = t1.value33
-t1.value10:CreateSection("Xeno Moss (Xeno & Solara)")
-t1.value10:CreateLabel("Enable first, then pick hitbox size.")
-t1.value10:CreateToggle("Enable Xeno Moss", "activates Xeno/Solara heading moss", false, function(p50)
-    t3.value66 = p50
-
-    if not p50 and t3.value65 then
-        t3.value65:Disconnect()
-    end
-end)
-
-function t1.value31()
-    t3.value67(2, 2.8, 3)
-end
-t1.value10:CreateButton("Xeno Moss 15%  â€” Small hitbox", "safest hitbox size", nil, t1.value31)
-
-function t1.value31()
-    t3.value67(2.5, 3.2, 3.3)
-end
-t1.value10:CreateButton("Xeno Moss 25%  â€” Slight", "small-ish hitbox", nil, t1.value31)
-
-function t1.value31()
-    t3.value67(3, 3.8, 3.6)
-end
-t1.value10:CreateButton("Xeno Moss 50%  â€” Balanced", "mid hitbox", nil, t1.value31)
-t1.value10:CreateButton("Xeno Moss 75%  â€” Aggressive", "large hitbox", nil, function()
-    t3.value67(3.5, 4.5, 4.1)
-end)
-
-function t1.value31()
-    t3.value67(4, 5, 4.5)
-end
-t1.value10:CreateButton("Xeno Moss 100% â€” Max hitbox", "max hitbox, blatant", nil, t1.value31)
-t1.value10:CreateDivider()
-t1.value10:CreateSection("Info")
-t1.value10:CreateParagraph("How Xeno Moss Works", "Fires Header remote + heading animation on entry.\nWorks on Xeno & Solara executors.")
-t3.value68 = {
-	tt = "4",
-	interp = "60",
-	s2 = "38720"
-}
-function t1.value32(p51)
-    return p51:gsub("^DFInt", ""):gsub("^DFFlag", ""):gsub("FString", ""):gsub("FLog", ""):gsub("^FFlag", ""):gsub("^DFint", ""):gsub("^FInt", "")
-end
-t3.value69 = nil
-t3.value70 = nil
-function t1.value31()
-    if not setfflag then
-        return
-    end
-
-    local _pairs = pairs
-    local tt = t3.value68.tt
-    local interp = t3.value68.interp
-    local s2 = t3.value68.s2
-
-    for v191, v192 in _pairs({
-		DFIntTargetTimeDelayFacctorTenths = tt,
-		FIntInterpolationMaxDelayMSec = interp,
-		DFIntS2PhysicsSenderRate = s2
-	}) do
-        local v193 = v192
-        local v194 = t3.value70(v191)
-        local u195 = v194
-        pcall(function()
-            if getfflag(u195) ~= nil then
-                setfflag(u195, v193)
-
-                return
-            end
-
-            if getfflag(v191) ~= nil then
-                setfflag(v191, v193)
-            end
-        end)
-    end
-end
-t3.value70 = t1.value32
-t3.value71 = t1.value31
-t1.value11:CreateSection("Flag Override")
-t1.value11:CreateLabel("Manually set the three main flags.")
-t1.value11:CreateInput("TargetTimeDelay", "DFIntTargetTimeDelayFacctorTenths", "Default: 4", nil, nil, function(p52)
-    if p52 ~= "" then
-        t3.value68.tt = p52
-    end
-end)
-t1.value11:CreateInput("Interpolation", "FIntInterpolationMaxDelayMSec", "Default: 60", nil, nil, function(p53)
-    if p53 ~= "" then
-        t3.value68.interp = p53
-    end
-end)
-t1.value11:CreateInput("PhysicsSenderRate", "DFIntS2PhysicsSenderRate", "Default: 38720", nil, nil, function(p54)
-    if p54 ~= "" then
-        t3.value68.s2 = p54
-    end
-end)
-
-function t1.value37()
-    if t3.value69 then
-        task.cancel(t3.value69)
-    end
-
-    t3.value69 = task.spawn(function()
-        while true do
-            t3.value71()
-            task.wait(20)
-        end
-    end)
-    t2.value15:Notify({
-		Title = "Flags",
-		Content = "Flag loop started.",
-		Duration = 3
-	})
-end
-t1.value11:CreateButton("Start Flag Loop", "start looped flag apply", nil, t1.value37)
-
-function t1.value37()
-    if t3.value69 then
-        task.cancel(t3.value69)
-    end
-
-    t2.value15:Notify({
-		Title = "Flags",
-		Content = "Flag loop stopped.",
-		Duration = 3
-	})
-end
-t1.value11:CreateButton("Unlock / Stop Loop", "stop the flag loop", nil, t1.value37)
-t1.value11:CreateDivider()
-t1.value11:CreateSection("Flag Inject (JSON)")
-t1.value11:CreateLabel("Paste raw JSON. Format: {\"FlagName\":\"value\"}")
-t3.value72 = nil
-t3.value73 = {}
-t1.value11:CreateInput("Flag JSON", "{\"DFIntTargetTimeDelayFacctorTenths\":\"7\"}", "Paste JSON here", nil, nil, function(p55)
-    local v200 = not p55
-
-    if not v200 then
-        v200 = p55 == ""
-    end
-
-    if v200 then
-        return
-    end
-
-    local ok3, result3 = pcall(function()
-        return t2.value4:JSONDecode(p55)
-    end)
-
-    if ok3 then
-        ok3 = type(result3) == "table"
-    end
-
-    if ok3 then
-        t3.value73 = result3
-        t2.value15:Notify({
-			Title = "Inject",
-			Content = "Flags parsed.",
-			Duration = 3
-		})
-
-        return
-    end
-
-    t2.value15:Notify({
-		Title = "Inject Error",
-		Content = "Invalid JSON.",
-		Duration = 4
-	})
-end)
-t1.value11:CreateButton("Start Inject", "start injecting parsed flags", nil, function()
-    if t3.value72 then
-        task.cancel(t3.value72)
-    end
-
-    t3.value72 = task.spawn(function()
-        while true do
-            if setfflag then
-                for k, v in pairs(t3.value73) do
-                    local v359 = v
-                    local v360 = t3.value70(k)
-
-                    pcall(function()
-                        if getfflag(v360) ~= nil then
-                            setfflag(v360, (tostring(v359)))
-
-                            return
-                        end
-
-                        if getfflag(k) ~= nil then
-                            setfflag(k, (tostring(v359)))
-                        end
-                    end)
-                end
-            end
-
-            task.wait(20)
-        end
-    end)
-    t2.value15:Notify({
-		Title = "Inject",
-		Content = "Injecting flags...",
-		Duration = 3
-	})
-end)
-t1.value11:CreateButton("Stop Inject", "stop the inject loop", nil, function()
-    if t3.value72 then
-        task.cancel(t3.value72)
-    end
-
-    t2.value15:Notify({
-		Title = "Inject",
-		Content = "Inject loop stopped.",
-		Duration = 3
-	})
-end)
-t1.value36 = Instance.new("ScreenGui")
-t3.value74 = t1.value36
-t1.value36 = t3.value74
-t1.value37 = "Name"
-t1.value36[t1.value37] = "ScripterkiddoExtras"
-t1.value36 = t3.value74
-t1.value37 = "ResetOnSpawn"
-t1.value36[t1.value37] = false
-t1.value36 = t3.value74
-t1.value37 = "Parent"
-t1.value36[t1.value37] = v7
-function t1.value36(p56, p57, p58, p59, p60)
-    local TextButton = Instance.new("TextButton", t3.value74)
-
-    TextButton.Size = UDim2.new(0, p59 or 115, 0, p60 or 50)
-    TextButton.Position = UDim2.new(0, p57, 0.5, p58)
-    TextButton.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-    TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    TextButton.Font = Enum.Font.GothamBlack
-    TextButton.TextSize = 14
-    TextButton.Text = p56
-    TextButton.Visible = false
-    Instance.new("UICorner", TextButton).CornerRadius = UDim.new(0.2, 0)
-
-    return TextButton
-end
-t1.value37 = t1.value36("blatant shot", 15, -120, 115, 50)
-t3.value75 = t1.value37
-t1.value37 = t1.value36("STICK\nOFF", 15, -57, 115, 115)
-t3.value76 = t1.value37
-t1.value37 = t3.value76
-t1.value35 = "TextSize"
-t1.value37[t1.value35] = 18
-t1.value12:CreateSection("200kickspersecond")
-t1.value12:CreateLabel("yo use only when losing badly")
-t3.value77 = nil
-t1.value42 = workspace:FindFirstChild("TPSSystem")
-t1.value38 = t1.value42
-if t1.value42 then
-    t1.value38 = workspace.TPSSystem:FindFirstChild("TPS")
-end
-t1.value37 = t1.value38
-if not t1.value38 then
-    t1.value37 = workspace:FindFirstChild("Ball")
-end
-t3.value78 = t1.value37
-t1.value39 = workspace:FindFirstChild("FE")
-t1.value37 = t1.value39
-if t1.value39 then
-    t1.value44 = workspace.FE:FindFirstChild("System")
-    t1.value45 = t1.value44
-
-    if t1.value44 then
-        t1.value45 = workspace.FE.System:FindFirstChild("Kick")
-    end
-
-    t1.value37 = t1.value45
-end
-t3.value79 = t1.value37
-function t1.value39()
-    return {
-		t2.value5.UserId,
-		t3.value78,
-		70,
-		t2.value12(400000, 350, 400000),
-		false,
-		true,
-		0,
-		"Rock'n'roll Star",
-		"NeverFearTruth",
-		"power=95/100"
-	}
-end
-t3.value80 = 0
-t3.value81 = t1.value39
-t1.value12:CreateToggle("200kickspersec", "auto-fires kick remote rapidly", false, function(p61)
-    t3.value75.Visible = p61
-
-    if t3.value77 then
-        t3.value77:Disconnect()
-    end
-
-    if not p61 then
-        return
-    end
-
-    if not t3.value78 or not t3.value79 then
-        return
-    end
-
-    t2.value1.PreSimulation:Connect(function()
-        local Character = t2.value5.Character
-
-        if not Character then
-            return
-        end
-
-        local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
-
-        if not HumanoidRootPart then
-            return
-        end
-
-        local v363 = t2.value11()
-        local v364 = false
-
-        if (HumanoidRootPart.Position - t3.value78.Position).Magnitude <= 10 then
-            v364 = v363 - t3.value80 >= 0
-        end
-
-        if v364 then
-            pcall(function()
-                local value79 = t3.value79
-                local _unpack = unpack
-                local t6 = { t3.value81() }
-
-                value79:FireServer(_unpack(v3(t6)))
-            end)
-        end
-    end)
-end)
-t3.value75.MouseButton1Click:Connect(function()
-    if not t3.value78 or not t3.value79 then
-        return
-    end
-
-    pcall(function()
-        t3.value79:FireServer(unpack(t3.value81()))
-    end)
-end)
-t1.value12:CreateDivider()
-function t1.value40()
-    local TPSSystem = workspace:FindFirstChild("TPSSystem")
-
-    if TPSSystem then
-        TPSSystem = TPSSystem:FindFirstChild("TPS")
-    end
-
-    if not TPSSystem then
-        TPSSystem = workspace:FindFirstChild("Ball")
-    end
-
-    return TPSSystem
-end
-t3.value82 = nil
-t1.value12:CreateSection("Loop TP to Ball 4ever")
-t3.value83 = nil
-function t1.value43()
-    t3.value83 = false
-    t3.value76.Text = "STICK\nOFF"
-    t3.value76.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-
-    if t3.value82 then
-        t3.value82:Disconnect()
-        t3.value82 = nil
-    end
-
-    local Character = t2.value5.Character
-    local v212 = Character
-
-    if Character then
-        v212 = Character:FindFirstChild("HumanoidRootPart")
-    end
-
-    if v212 then
-        pcall(function()
-            Character.HumanoidRootPart.Anchored = false
-        end)
-    end
-end
-t3.value83 = false
-t3.value82 = nil
-t3.value84 = nil
-function t1.value41()
-    if t3.value82 then
-        t3.value82:Disconnect()
-    end
-
-    t3.value83 = true
-    t3.value76.Text = "STICK\nON"
-    t3.value76.BackgroundColor3 = Color3.fromRGB(0, 200, 80)
-    t2.value1.Heartbeat:Connect(function()
-        local Character = t2.value5.Character
-
-        if Character then
-            Character = Character:FindFirstChild("HumanoidRootPart")
-        end
-
-        local v366 = Character
-        local v367 = t3.value84()
-
-        if not v366 or not v367 then
-            return
-        end
-
-        pcall(function()
-            v366.AssemblyLinearVelocity = t2.value13
-        end)
-
-        local LookVector = t2.value6.CFrame.LookVector
-
-        pcall(function()
-            v366.CFrame = CFrame.new(v367.Position + t2.value12(0, 3.1, 0), v367.Position + t2.value12(LookVector.X, 3.1, LookVector.Z))
-        end)
-    end)
-end
-t3.value84 = t1.value40
-t3.value85 = t1.value41
-t3.value86 = t1.value43
-t1.value43 = t3.value76.MouseButton1Click
-function t1.value46()
-    if t3.value83 then
-        t3.value86()
-
-        return
-    end
-
-    t3.value85()
-end
-t1.value43:Connect(t1.value46)
-t1.value12:CreateToggle("Enable Ball Stick", "teleport-locks you to the ball", false, function(p62)
-    t3.value76.Visible = p62
-
-    if not p62 then
-        t3.value86()
-    end
-end)
-t1.value12:CreateDivider()
-t1.value12:CreateSection("ZZZ Helper")
-t1.value12:CreateLabel("zzz helper.")
-t3.value87 = false
-t3.value88 = 9
-t3.value89 = nil
-t3.value90 = nil
-function t1.value47()
-    if t3.value90 then
-        t3.value90:Disconnect()
-    end
-
-    if t3.value89 then
-        pcall(function()
-            t3.value89:Destroy()
-        end)
-        t3.value89 = nil
-    end
-
-    if not t3.value87 then
-        return
-    end
-
-    local Part = Instance.new("Part")
-
-    Part.Name = "ZZZHelperPart"
-    Part.Size = Vector3.new(t3.value88, 0.001, t3.value88)
-    Part.Anchored = true
-    Part.Transparency = 1
-    Part.BrickColor = BrickColor.new("Bright red")
-    Part.Parent = workspace
-    t3.value89 = Part
-
-    local TPSSystem = workspace:FindFirstChild("TPSSystem")
-    local v216 = TPSSystem
-
-    if v216 then
-        v216 = TPSSystem:FindFirstChild("TPS")
-    end
-
-    local u217 = v216
-
-    t2.value1.RenderStepped:Connect(function()
-        local v369 = not u217
-
-        if not v369 then
-            v369 = not u217.Parent
-        end
-
-        if v369 then
-            TPSSystem = workspace:FindFirstChild("TPSSystem")
-
-            local v370 = TPSSystem
-
-            if v370 then
-                v370 = TPSSystem:FindFirstChild("TPS")
-            end
-
-            u217 = v370
-        end
-
-        if u217 and t3.value89 then
-            pcall(function()
-                t3.value89.Position = u217.Position - Vector3.new(0, 1, 0)
-            end)
-        end
-    end)
-end
-t3.value91 = t1.value47
-function t1.value53(p63)
-    t3.value87 = p63
-    t3.value91()
-end
-t1.value12:CreateToggle("Enable ZZZHELPER", "flat invisible part under ball", false, t1.value53)
-
-function t1.value52(p64)
-    t3.value88 = p64
-
-    if t3.value87 and t3.value89 then
-        pcall(function()
-            t3.value89.Size = Vector3.new(t3.value88, 0.001, t3.value88)
-        end)
-    end
-end
-t1.value12:CreateSlider("Helper Size", 0, 100, 9, t1.value52)
-t1.value12:CreateDivider()
-t1.value12:CreateSection("Target Speed")
-t1.value12:CreateLabel("Locks your Speed value every frame. Toggle on/off.")
-t3.value92 = false
-t3.value93 = nil
-t3.value94 = 70
-function t1.value55(p65)
-    t3.value92 = p65
-
-    if p65 then
-        if t3.value93 then
-            task.cancel(t3.value93)
-            t3.value93 = nil
-        end
-
-        t3.value93 = task.spawn(function()
-            while t3.value92 do
-                local Backpack = t2.value5:FindFirstChild("Backpack")
-                local Character = t2.value5.Character
-
-                pcall(function()
-                    if Backpack then
-                        local Speed = Backpack:FindFirstChild("Speed")
-
-                        if Speed then
-                            Speed.Value = t3.value94
-                        end
-                    end
-
-                    if Character then
-                        local Speed = Character:FindFirstChild("Speed")
-
-                        if Speed then
-                            Speed.Value = t3.value94
-                        end
-                    end
-                end)
-                task.wait(0)
-            end
-        end)
-
-        return
-    end
-
-    if t3.value93 then
-        task.cancel(t3.value93)
-    end
-end
-t1.value12:CreateToggle("Enable Target Speed", "freezes your speed value", false, t1.value55)
-
-function t1.value48(p66)
-    t3.value94 = p66
-end
-t1.value12:CreateSlider("Speed Value", 1, 70, 70, t1.value48)
-t1.value12:CreateDivider()
-t1.value12:CreateSection("Movement")
-t3.value95 = nil
-t3.value96 = false
-t3.value97 = nil
-function t1.value48()
-    if t3.value95 then
-        t3.value95:Disconnect()
-        t3.value95 = nil
-    end
-end
-t3.value95 = nil
-function t1.value55()
-    if t3.value95 then
-        t3.value95:Disconnect()
-    end
-
-    t2.value1.Heartbeat:Connect(function()
-        if not t3.value96 then
-            return
-        end
-
-        if os.clock() - 0 < 0.03 then
-            return
-        end
-
-        local Character = t2.value5.Character
-
-        if Character then
-            Character = Character:FindFirstChild("HumanoidRootPart")
-        end
-
-        local v376 = Character
-
-        if not v376 then
-            return
-        end
-
-        local value6CFrame = t2.value6.CFrame
-        local zero = Vector3.zero
-
-        if t2.value2:IsKeyDown(Enum.KeyCode.W) then
-            zero += value6CFrame.LookVector
-        end
-
-        if t2.value2:IsKeyDown(Enum.KeyCode.S) then
-            zero -= value6CFrame.LookVector
-        end
-
-        if t2.value2:IsKeyDown(Enum.KeyCode.A) then
-            zero -= value6CFrame.RightVector
-        end
-
-        if t2.value2:IsKeyDown(Enum.KeyCode.D) then
-            zero += value6CFrame.RightVector
-        end
-
-        if zero.Magnitude > 0 then
-            zero = Vector3.new(zero.X, 0, zero.Z).Unit
-            pcall(function()
-                v376.CFrame = v376.CFrame + zero * t3.value97
-            end)
-        end
-    end)
-end
-t3.value97 = 1.2
-t3.value98 = t1.value55
-t3.value99 = t1.value48
-t1.value12:CreateToggle("TP Walk", "teleport-based WASD movement", false, function(p67)
-    t3.value96 = p67
-
-    if p67 then
-        t3.value98()
-
-        return
-    end
-
-    t3.value99()
-end)
-t1.value12:CreateSlider("TP Speed", 0, 4, 1, function(p68)
-    t3.value97 = p68
-end)
-t3.value100 = false
-t3.value101 = 4
-t3.value102 = nil
-t3.value103 = nil
-t3.value104 = nil
-function t1.value49()
-    local Character = t2.value5.Character
-    local v225 = Character and Character:FindFirstChild("HumanoidRootPart")
-
-    if not v225 then
-        return
-    end
-
-    if t3.value103 then
-        pcall(function()
-            t3.value103:Destroy()
-        end)
-    end
-
-    if t3.value104 then
-        pcall(function()
-            t3.value104:Destroy()
-        end)
-    end
-
-    if t3.value102 then
-        t3.value102:Disconnect()
-    end
-
-    t3.value103 = Instance.new("BodyVelocity")
-    t3.value103.MaxForce = Vector3.new(9000000000, 9000000000, 9000000000)
-    t3.value103.P = 90000
-    t3.value103.Velocity = Vector3.zero
-    t3.value103.Parent = v225
-    t3.value104 = Instance.new("BodyGyro")
-    t3.value104.MaxTorque = Vector3.new(9000000000, 9000000000, 9000000000)
-    t3.value104.P = 90000
-    t3.value104.CFrame = v225.CFrame
-    t3.value104.Parent = v225
-    t3.value102 = t2.value1.Heartbeat:Connect(function()
-        local v379 = v225
-
-        if v379 then
-            v379 = v225.Parent and t3.value100
-        end
-
-        if not v379 then
-            return
-        end
-
-        local value6CFrame = t2.value6.CFrame
-        local zero = Vector3.zero
-
-        if t2.value2:IsKeyDown(Enum.KeyCode.W) then
-            zero += value6CFrame.LookVector
-        end
-
-        if t2.value2:IsKeyDown(Enum.KeyCode.S) then
-            zero -= value6CFrame.LookVector
-        end
-
-        if t2.value2:IsKeyDown(Enum.KeyCode.A) then
-            zero -= value6CFrame.RightVector
-        end
-
-        if t2.value2:IsKeyDown(Enum.KeyCode.D) then
-            zero += value6CFrame.RightVector
-        end
-
-        if t2.value2:IsKeyDown(Enum.KeyCode.Space) then
-            zero += Vector3.new(0, 1, 0)
-        end
-
-        if t2.value2:IsKeyDown(Enum.KeyCode.LeftShift) then
-            zero -= Vector3.new(0, 1, 0)
-        end
-
-        local v382 = t3.value101 * 18
-
-        pcall(function()
-            if zero.Magnitude > 0 then
-                t3.value103.Velocity = zero.Unit * v382
-            else
-                t3.value103.Velocity = Vector3.zero
-            end
-
-            t3.value104.CFrame = value6CFrame
-        end)
-    end)
-end
-function t1.value51()
-    t3.value100 = false
-
-    if t3.value102 then
-        t3.value102:Disconnect()
-    end
-
-    if t3.value103 then
-        pcall(function()
-            t3.value103:Destroy()
-        end)
-        t3.value103 = nil
-    end
-
-    if t3.value104 then
-        pcall(function()
-            t3.value104:Destroy()
-        end)
-        t3.value104 = nil
-    end
-end
-t3.value104 = nil
-t3.value105 = t1.value49
-t3.value106 = t1.value51
-t1.value12:CreateToggle("Fly", "WASD + Space + Shift to fly", false, function(p69)
-    t3.value100 = p69
-
-    if p69 then
-        t3.value105()
-
-        return
-    end
-
-    t3.value106()
-end)
-
-function t1.value57(p70)
-    t3.value101 = p70
-end
-t1.value12:CreateSlider("Fly Power", 1, 8, 4, t1.value57)
-t1.value12:CreateDivider()
-t1.value12:CreateSection("Sigma Xray")
-
-function t1.value56(p71)
-    if not p71 then
-        return
-    end
-
-    local GetDescendants = p71.GetDescendants
-
-    for _, v in pairs(GetDescendants(p71)) do
-        local v232 = v
-
-        if v232:IsA("BasePart") then
-            pcall(function()
-                v232.Material = Enum.Material.ForceField
-            end)
-        end
-    end
-end
-t3.value107 = t1.value56
-t1.value12:CreateToggle("Sigma Xray", "ForceField material on your character", false, function(p72)
-    if p72 then
-        if t2.value5.Character then
-            t3.value107(t2.value5.Character)
-
-            return
-        end
-    elseif t2.value5.Character then
-        for _, descendant in pairs(t2.value5.Character:GetDescendants()) do
-            local v236 = descendant
-
-            if v236:IsA("BasePart") then
-                pcall(function()
-                    v236.Material = Enum.Material.SmoothPlastic
-                end)
-            end
-        end
-    end
-end)
-
-function t1.value50()
-    local Character = t2.value5.Character
-
-    if Character then
-        Character = t2.value5.Character:FindFirstChildOfClass("Humanoid")
-    end
-
-    if Character then
-        Character = Character.RigType == Enum.HumanoidRigType.R15
-    end
-
-    return Character
-end
-t3.value108 = nil
-t3.value109 = nil
-t3.value110 = nil
-t3.value111 = 3
-t3.value112 = t1.value50
-t3.value113 = nil
-function t1.value54()
-    if t3.value110 then
-        t3.value110:Disconnect()
-    end
-
-    if t3.value109 then
-        pcall(function()
-            t3.value109:Stop()
-        end)
-    end
-
-    if t3.value108 then
-        pcall(function()
-            t3.value108:Destroy()
-        end)
-    end
-
-    t3.value109 = nil
-    t3.value108 = nil
-    t3.value110 = nil
-end
-function t1.value58(p73)
-    if t3.value110 then
-        t3.value110:Disconnect()
-    end
-
-    if t3.value109 then
-        pcall(function()
-            t3.value109:Stop()
-        end)
-    end
-
-    if t3.value108 then
-        pcall(function()
-            t3.value108:Destroy()
-        end)
-    end
-
-    local Character = t2.value5.Character
-
-    if not Character then
-        return
-    end
-
-    local Humanoid = Character:FindFirstChildWhichIsA("Humanoid")
-
-    if not Humanoid then
-        return
-    end
-
-    local Animator = Humanoid:FindFirstChildOfClass("Animator")
-
-    if not Animator then
-        Animator = Instance.new("Animator", Humanoid)
-    end
-
-    local v242 = Animator
-
-    t3.value108 = Instance.new("Animation")
-    t3.value108.AnimationId = not t3.value112() and "rbxassetid://148840371" or "rbxassetid://5918726674"
-    pcall(function()
-        t3.value109 = v242:LoadAnimation(t3.value108)
-        t3.value109.Priority = Enum.AnimationPriority.Action4
-        t3.value109.Looped = true
-        t3.value109:Play(0.1, 1, 1)
-        t3.value109:AdjustSpeed(p73 or 3)
-    end)
-    Humanoid.Died:Connect(function()
-        t3.value113()
-    end)
-end
-t3.value113 = t1.value54
-t3.value114 = t1.value58
-t1.value12:CreateDivider()
-t1.value12:CreateSection("Air Bang")
-t1.value12:CreateToggle("Air Bang", "looped jump animation", false, function(p74)
-    if p74 then
-        t3.value114(t3.value111)
-
-        return
-    end
-
-    t3.value113()
-end)
-
-function t1.value59(p75)
-    if t3.value109 then
-        pcall(function()
-            t3.value109:AdjustSpeed(p75)
-        end)
-    end
-end
-t1.value12:CreateSlider("Bang Speed", 1, 10, 3, t1.value59)
-t1.value12:CreateDivider()
-t1.value12:CreateSection("IMPORTANT")
-t1.value12:CreateParagraph("Warning", "instant Shoot + ball Stick = blatant.\nOnly when losing badly.\n\nFly = WASD+Space+Shift.\nZZZ Helper = flat invisible part under ball.\nTarget Speed = locks ur Speed value.")
-t1.value13:CreateSection("Hub Settings")
-t1.value13:CreateKeybind("Toggle Keybind", "key to open/close the hub", "LeftControl", function(p76)
-    pcall(function()
-        t3.value1:SetKeybind(p76)
-    end)
-end)
-t1.value13:CreateDivider()
-t1.value13:CreateSection("About")
-t1.value13:CreateParagraph("scripterkiddo tps hub", "scripterkiddo")
-t1.value13:CreateParagraph("Discord", "discord.gg/q2ZvgAxsre")
-t2.value15:Notify({
-	Title = "scripterkiddo tps hub Loaded",
-	Content = "LeftControl / tap S button to toggle.  discord.gg/q2ZvgAxsre",
-	Duration = 8
+CombatTab:CreateSection("Hitbox Expander")
+
+local hitboxEnabled = false
+local hitboxSize = 10
+
+CombatTab:CreateToggle({
+	Name = "Expand Hitboxes (All Characters)",
+	CurrentValue = false,
+	Flag = "HitboxToggle",
+	Callback = function(Value)
+		hitboxEnabled = Value
+	end,
 })
-if v9 then
-    task.wait(1)
-    t2.value15:Notify({
-		Title = "Xeno / Solara detected",
-		Content = "yo ur on Xeno or Solara â€” please use the Xeno Reach and Xeno Moss tabs",
-		Duration = 10
-	})
+
+CombatTab:CreateSlider({
+	Name = "Hitbox Size",
+	Range = {2, 35},
+	Increment = 1,
+	Suffix = "Studs",
+	CurrentValue = 10,
+	Flag = "HitboxSizeSlider",
+	Callback = function(Value)
+		hitboxSize = Value
+	end,
+})
+
+RunService.Heartbeat:Connect(function()
+	if not hitboxEnabled then return end
+	for _, obj in ipairs(Workspace:GetDescendants()) do
+		if obj:IsA("Humanoid") and obj.Parent and obj.Parent ~= player.Character then
+			local hrp = obj.Parent:FindFirstChild("HumanoidRootPart")
+			if hrp then
+				hrp.Size = Vector3.new(hitboxSize, hitboxSize, hitboxSize)
+				hrp.Transparency = 0.7
+				hrp.BrickColor = BrickColor.new("Really red")
+				hrp.Material = Enum.Material.Neon
+				hrp.CanCollide = false
+			end
+		end
+	end
+end)
+
+-- ==========================================
+-- ðŸš€ MOVEMENT SECTION
+-- ==========================================
+MovementTab:CreateSection("Speed & Jump Modifiers")
+
+local walkSpeedEnabled = false
+local targetWalkSpeed = 16
+local jumpPowerEnabled = false
+local targetJumpPower = 50
+
+MovementTab:CreateToggle({
+	Name = "Enable WalkSpeed Modifier",
+	CurrentValue = false,
+	Flag = "WalkSpeedToggle",
+	Callback = function(Value)
+		walkSpeedEnabled = Value
+		if not Value and player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+			player.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = 16
+		end
+	end,
+})
+
+MovementTab:CreateSlider({
+	Name = "WalkSpeed Value",
+	Range = {16, 250},
+	Increment = 2,
+	Suffix = "Speed",
+	CurrentValue = 16,
+	Flag = "WalkSpeedSlider",
+	Callback = function(Value)
+		targetWalkSpeed = Value
+	end,
+})
+
+MovementTab:CreateToggle({
+	Name = "Enable JumpPower Modifier",
+	CurrentValue = false,
+	Flag = "JumpPowerToggle",
+	Callback = function(Value)
+		jumpPowerEnabled = Value
+		if not Value and player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+			player.Character:FindFirstChildOfClass("Humanoid").JumpPower = 50
+		end
+	end,
+})
+
+MovementTab:CreateSlider({
+	Name = "JumpPower Value",
+	Range = {50, 300},
+	Increment = 5,
+	Suffix = "Power",
+	CurrentValue = 50,
+	Flag = "JumpPowerSlider",
+	Callback = function(Value)
+		targetJumpPower = Value
+	end,
+})
+
+RunService.Heartbeat:Connect(function()
+	if player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+		local hum = player.Character:FindFirstChildOfClass("Humanoid")
+		if walkSpeedEnabled then hum.WalkSpeed = targetWalkSpeed end
+		if jumpPowerEnabled then hum.JumpPower = targetJumpPower end
+	end
+end)
+
+MovementTab:CreateSection("Flight Controls")
+
+local flying = false
+local flySpeed = 50
+local flyBodyVelocity = Instance.new("BodyVelocity")
+flyBodyVelocity.Velocity = Vector3.zero
+flyBodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)
+
+local flyBodyGyro = Instance.new("BodyGyro")
+flyBodyGyro.MaxTorque = Vector3.new(100000, 100000, 100000)
+
+local inputFlags = { forward = false, back = false, left = false, right = false, up = false, down = false }
+
+local flyScreenGui = Instance.new("ScreenGui")
+flyScreenGui.Name = "FlyScreenGui"
+flyScreenGui.ResetOnSpawn = false
+pcall(function() flyScreenGui.Parent = safeParent end)
+
+local flyControlsContainer = Instance.new("Frame")
+flyControlsContainer.Name = "FlyControlsContainer"
+flyControlsContainer.Size = UDim2.new(1, 0, 1, 0)
+flyControlsContainer.BackgroundTransparency = 1
+flyControlsContainer.Visible = false
+flyControlsContainer.Parent = flyScreenGui
+
+local function createFlyButton(parent, name, text, pos, size)
+	local btn = Instance.new("TextButton")
+	btn.Name = name
+	btn.Text = text
+	btn.Size = size
+	btn.Position = pos
+	btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.Font = Enum.Font.GothamBold
+	btn.TextScaled = true
+	btn.BackgroundTransparency = 0.2
+	btn.Parent = parent
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 12)
+	corner.Parent = btn
+	return btn
 end
+
+local dpadSize = UDim2.new(0, 60, 0, 60)
+local forwardBtn = createFlyButton(flyControlsContainer, "ForwardButton", "â†‘", UDim2.new(0, 70, 1, -190), dpadSize)
+local backBtn = createFlyButton(flyControlsContainer, "BackButton", "â†“", UDim2.new(0, 70, 1, -70), dpadSize)
+local leftBtn = createFlyButton(flyControlsContainer, "LeftButton", "â†", UDim2.new(0, 10, 1, -130), dpadSize)
+local rightBtn = createFlyButton(flyControlsContainer, "RightButton", "â†’", UDim2.new(0, 130, 1, -130), dpadSize)
+local upBtn = createFlyButton(flyControlsContainer, "UpButton", "Up", UDim2.new(1, -110, 1, -190), dpadSize)
+local downBtn = createFlyButton(flyControlsContainer, "DownButton", "Down", UDim2.new(1, -110, 1, -70), dpadSize)
+
+local function addTouchEvents(button, flagName)
+	button.MouseButton1Down:Connect(function() inputFlags[flagName] = true end)
+	button.MouseButton1Up:Connect(function() inputFlags[flagName] = false end)
+	button.MouseLeave:Connect(function() inputFlags[flagName] = false end)
+end
+
+addTouchEvents(forwardBtn, "forward")
+addTouchEvents(backBtn, "back")
+addTouchEvents(leftBtn, "left")
+addTouchEvents(rightBtn, "right")
+addTouchEvents(upBtn, "up")
+addTouchEvents(downBtn, "down")
+
+local function startFlying()
+	local char = player.Character
+	if not char or not char:FindFirstChild("HumanoidRootPart") or not char:FindFirstChildOfClass("Humanoid") then return end
+	flying = true
+	flyBodyVelocity.Parent = char.HumanoidRootPart
+	flyBodyGyro.Parent = char.HumanoidRootPart
+	char:FindFirstChildOfClass("Humanoid").PlatformStand = true
+	flyControlsContainer.Visible = true
+end
+
+local function stopFlying()
+	flying = false
+	flyBodyVelocity.Parent = nil
+	flyBodyGyro.Parent = nil
+	if player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+		player.Character:FindFirstChildOfClass("Humanoid").PlatformStand = false
+	end
+	flyControlsContainer.Visible = false
+end
+
+MovementTab:CreateToggle({
+	Name = "Enable Fly (Touch & WASD Controls)",
+	CurrentValue = false,
+	Flag = "FlyToggle",
+	Callback = function(Value)
+		if Value then startFlying() else stopFlying() end
+	end,
+})
+
+MovementTab:CreateSlider({
+	Name = "Fly Speed",
+	Range = {10, 300},
+	Increment = 5,
+	Suffix = "Speed",
+	CurrentValue = 50,
+	Flag = "FlySpeedSlider",
+	Callback = function(Value)
+		flySpeed = Value
+	end,
+})
+
+RunService.RenderStepped:Connect(function()
+	if flying and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+		local moveDirection = Vector3.zero
+		local camCF = Camera.CFrame
+
+		if inputFlags.forward or UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDirection = moveDirection + camCF.LookVector end
+		if inputFlags.back or UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDirection = moveDirection - camCF.LookVector end
+		if inputFlags.left or UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDirection = moveDirection - camCF.RightVector end
+		if inputFlags.right or UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDirection = moveDirection + camCF.RightVector end
+		if inputFlags.up or UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDirection = moveDirection + Vector3.new(0, 1, 0) end
+		if inputFlags.down or UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then moveDirection = moveDirection - Vector3.new(0, 1, 0) end
+
+		if moveDirection.Magnitude > 0 then moveDirection = moveDirection.Unit end
+		flyBodyVelocity.Velocity = moveDirection * flySpeed
+		flyBodyGyro.CFrame = camCF
+	end
+end)
+
+MovementTab:CreateSection("Movement Utilities")
+
+local noclip = false
+MovementTab:CreateToggle({
+	Name = "Noclip (Walk Through Walls)",
+	CurrentValue = false,
+	Flag = "NoclipToggle",
+	Callback = function(Value)
+		noclip = Value
+	end,
+})
+
+RunService.Stepped:Connect(function()
+	if noclip and player.Character then
+		for _, part in ipairs(player.Character:GetDescendants()) do
+			if part:IsA("BasePart") and part.CanCollide then
+				part.CanCollide = false
+			end
+		end
+	end
+end)
+
+local infiniteJump = false
+MovementTab:CreateToggle({
+	Name = "Infinite Jump",
+	CurrentValue = false,
+	Flag = "InfiniteJumpToggle",
+	Callback = function(Value)
+		infiniteJump = Value
+	end,
+})
+
+UserInputService.JumpRequest:Connect(function()
+	if infiniteJump and player.Character then
+		local hum = player.Character:FindFirstChildOfClass("Humanoid")
+		if hum then
+			hum:ChangeState(Enum.HumanoidStateType.Jumping)
+		end
+	end
+end)
+
+local airSwim = false
+MovementTab:CreateToggle({
+	Name = "Air Swimming",
+	CurrentValue = false,
+	Flag = "AirSwimToggle",
+	Callback = function(Value)
+		airSwim = Value
+	end,
+})
+
+RunService.Heartbeat:Connect(function()
+	if airSwim and player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+		player.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Swimming, true)
+		player.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Swimming)
+	end
+end)
+
+local spinbotEnabled = false
+local spinSpeed = 20
+MovementTab:CreateToggle({
+	Name = "Enable SpinBot",
+	CurrentValue = false,
+	Flag = "SpinBotToggle",
+	Callback = function(Value)
+		spinbotEnabled = Value
+	end,
+})
+
+MovementTab:CreateSlider({
+	Name = "SpinBot Speed",
+	Range = {5, 100},
+	Increment = 5,
+	Suffix = "RPM",
+	CurrentValue = 20,
+	Flag = "SpinSpeedSlider",
+	Callback = function(Value)
+		spinSpeed = Value
+	end,
+})
+
+RunService.RenderStepped:Connect(function()
+	if spinbotEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+		player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(spinSpeed), 0)
+	end
+end)
+
+-- ==========================================
+-- ðŸ’¥ TROLL & COMMANDS SECTION
+-- ==========================================
+CommandsTab:CreateSection("Fling Actions")
+
+local flingTargetName = ""
+local isFlinging = false
+local loopFlingActive = false
+
+local FlingDropdown = CommandsTab:CreateDropdown({
+	Name = "Select Target",
+	Options = getPlayerList(),
+	CurrentOption = {},
+	MultipleOptions = false,
+	Flag = "FlingPlayerDropdown",
+	Callback = function(Option)
+		flingTargetName = type(Option) == "table" and (Option[1] or "") or Option
+	end,
+})
+
+CommandsTab:CreateButton({
+	Name = "ðŸ”„ Refresh Player List",
+	Callback = function()
+		FlingDropdown:Refresh(getPlayerList())
+		Rayfield:Notify({ Title = "System", Content = "Player list refreshed!", Duration = 1.5 })
+	end,
+})
+
+local function aggressiveFling(targetPlayer)
+	if isFlinging then return end
+	local char = player.Character
+	if not (char and targetPlayer and targetPlayer.Character) then return end
+
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	local humanoid = char:FindFirstChildOfClass("Humanoid")
+	local targetHrp = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+	if not hrp or not targetHrp then return end
+
+	isFlinging = true
+	local originalCFrame = hrp.CFrame
+
+	local thr = Instance.new("BodyThrust")
+	thr.Name = "FlingThrust"
+	thr.Force = Vector3.new(99999, 99999, 99999)
+	thr.Location = hrp.Position
+	thr.Parent = hrp
+
+	local startTime = tick()
+
+	repeat
+		if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+			hrp.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+			thr.Location = targetPlayer.Character.HumanoidRootPart.Position
+		end
+		RunService.Heartbeat:Wait()
+	until not (targetPlayer.Character and targetPlayer.Character:FindFirstChild("Head")) 
+	   or (tick() - startTime > 2.5) 
+	   or not isFlinging
+
+	if thr then thr:Destroy() end
+
+	if hrp then
+		hrp.AssemblyLinearVelocity = Vector3.zero
+		hrp.AssemblyAngularVelocity = Vector3.zero
+		hrp.Anchored = true
+		hrp.CFrame = originalCFrame
+		task.wait(0.1)
+		hrp.AssemblyLinearVelocity = Vector3.zero
+		hrp.AssemblyAngularVelocity = Vector3.zero
+		hrp.Anchored = false
+	end
+
+	if humanoid then
+		humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+	end
+
+	isFlinging = false
+end
+
+CommandsTab:CreateButton({
+	Name = "ðŸ’¥ FLING TARGET ONCE",
+	Callback = function()
+		local target = findPlayerByName(flingTargetName)
+		if not target then
+			Rayfield:Notify({ Title = "Error", Content = "Select a target first!", Duration = 2 })
+			return
+		end
+		Rayfield:Notify({ Title = "Flinging", Content = "Targeting: " .. target.Name, Duration = 2 })
+		aggressiveFling(target)
+	end,
+})
+
+CommandsTab:CreateToggle({
+	Name = "ðŸ” Loop Fling Target",
+	CurrentValue = false,
+	Flag = "LoopFlingToggle",
+	Callback = function(Value)
+		loopFlingActive = Value
+		if Value then
+			task.spawn(function()
+				while loopFlingActive do
+					local target = findPlayerByName(flingTargetName)
+					if target and target.Character then
+						aggressiveFling(target)
+					end
+					task.wait(0.5)
+				end
+			end)
+		end
+	end,
+})
+
+CommandsTab:CreateButton({
+	Name = "ðŸŒªï¸ FLING ALL PLAYERS",
+	Callback = function()
+		task.spawn(function()
+			for _, p in ipairs(Players:GetPlayers()) do
+				if p ~= player and p.Character then
+					aggressiveFling(p)
+					task.wait(0.2)
+				end
+			end
+		end)
+	end,
+})
+
+CommandsTab:CreateSection("Teleports & Click TP")
+
+local tpTargetName = ""
+CommandsTab:CreateDropdown({
+	Name = "Select Player to TP",
+	Options = getPlayerList(),
+	CurrentOption = {},
+	MultipleOptions = false,
+	Flag = "TPPlayerDropdown",
+	Callback = function(Option)
+		tpTargetName = type(Option) == "table" and (Option[1] or "") or Option
+	end,
+})
+
+CommandsTab:CreateButton({
+	Name = "Teleport to Player",
+	Callback = function()
+		local target = findPlayerByName(tpTargetName)
+		if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+			if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+				player.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+				Rayfield:Notify({ Title = "Success", Content = "Teleported to " .. target.Name, Duration = 2 })
+			end
+		end
+	end,
+})
+
+local clickTPEnabled = false
+CommandsTab:CreateToggle({
+	Name = "Click TP (Hold Ctrl + Left Click)",
+	CurrentValue = false,
+	Flag = "ClickTPToggle",
+	Callback = function(Value)
+		clickTPEnabled = Value
+	end,
+})
+
+UserInputService.InputBegan:Connect(function(input, processed)
+	if not processed and clickTPEnabled and input.UserInputType == Enum.UserInputType.MouseButton1 then
+		if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl) then
+			local mouse = player:GetMouse()
+			if mouse.Hit and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+				player.Character.HumanoidRootPart.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0, 3, 0))
+				Rayfield:Notify({ Title = "Teleported", Content = "Teleported to click position!", Duration = 1 })
+			end
+		end
+	end
+end)
+
+-- ==========================================
+-- ðŸ‘ï¸ VISUALS SECTION (ESP, X-RAY, WORLD)
+-- ==========================================
+VisualsTab:CreateSection("Player ESP")
+local espEnabled = false
+local espTagsEnabled = false
+
+local function applyESP(targetPlayer)
+	if targetPlayer == player then return end
+	if targetPlayer.Character then
+		local highlight = targetPlayer.Character:FindFirstChild("AdminESPHighlight")
+		if not highlight then
+			highlight = Instance.new("Highlight")
+			highlight.Name = "AdminESPHighlight"
+			highlight.FillColor = Color3.fromRGB(255, 30, 30)
+			highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+			highlight.FillTransparency = 0.5
+			highlight.OutlineTransparency = 0
+			highlight.Parent = targetPlayer.Character
+		end
+		highlight.Enabled = espEnabled
+
+		if espTagsEnabled then
+			local head = targetPlayer.Character:FindFirstChild("Head")
+			if head and not head:FindFirstChild("AdminESPTag") then
+				local bb = Instance.new("BillboardGui")
+				bb.Name = "AdminESPTag"
+				bb.Size = UDim2.new(0, 120, 0, 40)
+				bb.StudsOffset = Vector3.new(0, 2.5, 0)
+				bb.AlwaysOnTop = true
+				bb.Parent = head
+
+				local lbl = Instance.new("TextLabel")
+				lbl.Size = UDim2.new(1, 0, 1, 0)
+				lbl.BackgroundTransparency = 1
+				lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+				lbl.TextStrokeTransparency = 0
+				lbl.Font = Enum.Font.GothamBold
+				lbl.TextSize = 11
+				lbl.Text = targetPlayer.Name
+				lbl.Parent = bb
+			end
+		end
+	end
+end
+
+VisualsTab:CreateToggle({
+	Name = "Enable Player Highlight ESP",
+	CurrentValue = false,
+	Flag = "ESPToggle",
+	Callback = function(Value)
+		espEnabled = Value
+		for _, p in ipairs(Players:GetPlayers()) do
+			if p ~= player then
+				if espEnabled then 
+					applyESP(p) 
+				else
+					if p.Character and p.Character:FindFirstChild("AdminESPHighlight") then
+						p.Character.AdminESPHighlight:Destroy()
+					end
+				end
+			end
+		end
+	end,
+})
+
+VisualsTab:CreateToggle({
+	Name = "Show Player Name & Distance Tags",
+	CurrentValue = false,
+	Flag = "ESPTagsToggle",
+	Callback = function(Value)
+		espTagsEnabled = Value
+		for _, p in ipairs(Players:GetPlayers()) do
+			if p ~= player and p.Character then
+				local head = p.Character:FindFirstChild("Head")
+				if head then
+					if Value then
+						applyESP(p)
+					elseif head:FindFirstChild("AdminESPTag") then
+						head.AdminESPTag:Destroy()
+					end
+				end
+			end
+		end
+	end,
+})
+
+VisualsTab:CreateSection("Zombie / Mob ESP")
+local zombieESPEnabled = false
+
+VisualsTab:CreateToggle({
+	Name = "Enable Zombie / NPC Highlight",
+	CurrentValue = false,
+	Flag = "ZombieESPToggle",
+	Callback = function(Value)
+		zombieESPEnabled = Value
+	end,
+})
+
+RunService.Heartbeat:Connect(function()
+	if not zombieESPEnabled then return end
+	for _, model in ipairs(Workspace:GetChildren()) do
+		if model:IsA("Model") and model:FindFirstChildOfClass("Humanoid") and not Players:GetPlayerFromCharacter(model) then
+			local h = model:FindFirstChild("ZombieHighlight")
+			if not h then
+				h = Instance.new("Highlight")
+				h.Name = "ZombieHighlight"
+				h.FillColor = Color3.fromRGB(0, 255, 0)
+				h.OutlineColor = Color3.fromRGB(255, 255, 255)
+				h.FillTransparency = 0.5
+				h.Parent = model
+			end
+		end
+	end
+end)
+
+VisualsTab:CreateSection("Visual Enhancements")
+
+local xrayEnabled = false
+local originalTransparencies = {}
+VisualsTab:CreateToggle({
+	Name = "X-Ray Mode (See Through Walls)",
+	CurrentValue = false,
+	Flag = "XRayToggle",
+	Callback = function(Value)
+		xrayEnabled = Value
+		for _, part in ipairs(Workspace:GetDescendants()) do
+			if part:IsA("BasePart") and not (part.Parent and part.Parent:FindFirstChildOfClass("Humanoid")) then
+				if Value then
+					if not originalTransparencies[part] then
+						originalTransparencies[part] = part.Transparency
+					end
+					part.Transparency = 0.65
+				else
+					if originalTransparencies[part] then
+						part.Transparency = originalTransparencies[part]
+					end
+				end
+			end
+		end
+		if not Value then table.clear(originalTransparencies) end
+	end,
+})
+
+local fullbrightEnabled = false
+local originalLighting = {
+	Brightness = Lighting.Brightness,
+	ClockTime = Lighting.ClockTime,
+	FogEnd = Lighting.FogEnd,
+	GlobalShadows = Lighting.GlobalShadows,
+	Ambient = Lighting.Ambient
+}
+
+VisualsTab:CreateToggle({
+	Name = "â˜€ï¸ Fullbright (Night Vision)",
+	CurrentValue = false,
+	Flag = "FullbrightToggle",
+	Callback = function(Value)
+		fullbrightEnabled = Value
+		if Value then
+			Lighting.Brightness = 2
+			Lighting.ClockTime = 14
+			Lighting.FogEnd = 1e6
+			Lighting.GlobalShadows = false
+			Lighting.Ambient = Color3.fromRGB(255, 255, 255)
+		else
+			Lighting.Brightness = originalLighting.Brightness
+			Lighting.ClockTime = originalLighting.ClockTime
+			Lighting.FogEnd = originalLighting.FogEnd
+			Lighting.GlobalShadows = originalLighting.GlobalShadows
+			Lighting.Ambient = originalLighting.Ambient
+		end
+	end,
+})
+
+VisualsTab:CreateSlider({
+	Name = "Field of View (Camera FOV)",
+	Range = {50, 120},
+	Increment = 1,
+	Suffix = "Â°",
+	CurrentValue = 70,
+	Flag = "CameraFOVSlider",
+	Callback = function(Value)
+		Camera.FieldOfView = Value
+	end,
+})
+
+-- ==========================================
+-- âš¡ GRAPHICS & PERFORMANCE SECTION
+-- ==========================================
+GraphicsTab:CreateSection("FastFlags & Performance")
+
+GraphicsTab:CreateButton({
+	Name = "âš¡ Uncap FPS (240 FPS)",
+	Callback = function()
+		safeSetFPS(240)
+		Rayfield:Notify({ Title = "FastFlags", Content = "FPS target set to 240.", Duration = 2 })
+	end,
+})
+
+GraphicsTab:CreateButton({
+	Name = "ðŸš« Disable Shadows",
+	Callback = function()
+		Lighting.GlobalShadows = false
+		safeSetFFlag("FFlagDebugGraphicsDisableShadows", "True")
+		Rayfield:Notify({ Title = "FastFlags", Content = "Shadows disabled.", Duration = 2 })
+	end,
+})
+
+GraphicsTab:CreateButton({
+	Name = "âœ¨ Disable PostFX & Blur",
+	Callback = function()
+		safeSetFFlag("FFlagGraphicsDisablePostFX", "True")
+		for _, v in ipairs(Lighting:GetChildren()) do
+			if v:IsA("PostEffect") or v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("BloomEffect") then
+				v.Enabled = false
+			end
+		end
+		Rayfield:Notify({ Title = "FastFlags", Content = "Post-processing disabled.", Duration = 2 })
+	end,
+})
+
+GraphicsTab:CreateButton({
+	Name = "ðŸŒ«ï¸ Remove Fog & Atmosphere",
+	Callback = function()
+		Lighting.FogEnd = 1e9
+		for _, v in ipairs(Lighting:GetChildren()) do
+			if v:IsA("Atmosphere") then
+				v.Density = 0
+			end
+		end
+		Rayfield:Notify({ Title = "Graphics", Content = "Fog and atmosphere cleared.", Duration = 2 })
+	end,
+})
+
+GraphicsTab:CreateSection("Texture Controls")
+
+local cachedProps = {}
+local noTextureMode = false
+
+GraphicsTab:CreateButton({
+	Name = "No Textures (Potato Mode)",
+	Callback = function()
+		if noTextureMode then return end
+		noTextureMode = true
+		Lighting.GlobalShadows = false
+
+		safeSetFFlag("DFIntTextureQualityOverride", "1")
+
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+			if obj:IsA("BasePart") and not (obj.Parent and obj.Parent:FindFirstChildOfClass("Humanoid")) then
+				cachedProps[obj] = { Material = obj.Material }
+				obj.Material = Enum.Material.SmoothPlastic
+			elseif obj:IsA("Decal") or obj:IsA("Texture") then
+				cachedProps[obj] = { Transparency = obj.Transparency }
+				obj.Transparency = 1
+			end
+		end
+
+		Rayfield:Notify({ Title = "Graphics", Content = "Textures removed completely.", Duration = 2.5 })
+	end,
+})
+
+GraphicsTab:CreateButton({
+	Name = "Reset Textures & Graphics",
+	Callback = function()
+		if not noTextureMode then return end
+		noTextureMode = false
+		Lighting.GlobalShadows = true
+
+		for obj, props in pairs(cachedProps) do
+			if obj and obj.Parent then
+				if props.Material then obj.Material = props.Material end
+				if props.Transparency then obj.Transparency = props.Transparency end
+			end
+		end
+
+		table.clear(cachedProps)
+		Rayfield:Notify({ Title = "Graphics", Content = "Graphics reset to normal.", Duration = 2.5 })
+	end,
+})
+
+-- ==========================================
+-- ðŸ› ï¸ PLAYER & MISC EXPLOITS
+-- ==========================================
+MiscTab:CreateSection("Character Exploits")
+
+local antiVoid = false
+MiscTab:CreateToggle({
+	Name = "Anti-Void (Auto Bounce back up)",
+	CurrentValue = false,
+	Flag = "AntiVoidToggle",
+	Callback = function(Value)
+		antiVoid = Value
+	end,
+})
+
+RunService.Heartbeat:Connect(function()
+	if antiVoid and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+		local hrp = player.Character.HumanoidRootPart
+		local minHeight = (Workspace.FallenPartsDestroyHeight or -500) + 35
+		if hrp.Position.Y < minHeight then
+			hrp.AssemblyLinearVelocity = Vector3.new(0, 120, 0)
+			hrp.CFrame = hrp.CFrame + Vector3.new(0, 60, 0)
+		end
+	end
+end)
+
+local isFrozen = false
+MiscTab:CreateToggle({
+	Name = "Freeze Character in Mid-Air",
+	CurrentValue = false,
+	Flag = "FreezeToggle",
+	Callback = function(Value)
+		isFrozen = Value
+		if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			player.Character.HumanoidRootPart.Anchored = Value
+		end
+	end,
+})
+
+MiscTab:CreateSlider({
+	Name = "World Gravity Modifier",
+	Range = {0, 300},
+	Increment = 5,
+	Suffix = "Gravity",
+	CurrentValue = 196,
+	Flag = "GravitySlider",
+	Callback = function(Value)
+		Workspace.Gravity = Value
+	end,
+})
+
+local antiRagdoll = false
+MiscTab:CreateToggle({
+	Name = "Anti-Ragdoll / Anti-Sit",
+	CurrentValue = false,
+	Flag = "AntiRagdollToggle",
+	Callback = function(Value)
+		antiRagdoll = Value
+	end,
+})
+
+RunService.Heartbeat:Connect(function()
+	if antiRagdoll and player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+		local hum = player.Character:FindFirstChildOfClass("Humanoid")
+		hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+		hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+		if hum.Sit then
+			hum.Sit = false
+		end
+	end
+end)
+
+MiscTab:CreateSection("Server Utilities")
+
+MiscTab:CreateButton({
+	Name = "ðŸ”„ Rejoin Current Server",
+	Callback = function()
+		Rayfield:Notify({ Title = "Server", Content = "Rejoining...", Duration = 2 })
+		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
+	end,
+})
+
+MiscTab:CreateButton({
+	Name = "ðŸŒ Server Hop (Join New Server)",
+	Callback = function()
+		Rayfield:Notify({ Title = "Server Hop", Content = "Finding a new server...", Duration = 3 })
+		pcall(function()
+			local serversApi = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
+			local response = game:HttpGet(serversApi)
+			local body = HttpService:JSONDecode(response)
+			if body and body.data then
+				for _, s in ipairs(body.data) do
+					if s.playing < s.maxPlayers and s.id ~= game.JobId then
+						TeleportService:TeleportToPlaceInstance(game.PlaceId, s.id, player)
+						return
+					end
+				end
+			end
+			Rayfield:Notify({ Title = "Error", Content = "No alternate servers found.", Duration = 2 })
+		end)
+	end,
+})
+
+-- Anti-AFK Hook
+player.Idled:Connect(function()
+	VirtualUser:CaptureController()
+	VirtualUser:ClickButton2(Vector2.new())
+end)
+```
