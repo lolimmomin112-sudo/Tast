@@ -1,6 +1,6 @@
--- Modified by scripterkiddo
--- Made by jack
+-- This file was generated
 -- MoonVeil Deobfuscator Created By Skynex Okinbru
+-- Made by jack
 
 if not game:IsLoaded() then
 	pcall(function()
@@ -2791,4 +2791,30 @@ do
 						local v877 = u186(u185.RootPart.Position, u185.Config.KnifeThrowAura)
 
 						if v877 then
-							if v874.Parent == u185.Backpack and u185
+							if v874.Parent == u185.Backpack and u185.Humanoid then
+								u185.Humanoid:EquipTool(v874)
+								task.wait(0.05)
+							end
+
+							local Character4 = v877.Character
+							local v879 = Character4 and Character4:FindFirstChild("HumanoidRootPart")
+							local v880 = Character4 and Character4:FindFirstChild("Humanoid")
+
+							if v879 and v880 then
+								local n7 = 0.06
+
+								if u187 then
+									local Network = u187:FindFirstChild("Network")
+									local v883 = Network and Network:FindFirstChild("ServerStatsItem")
+									local v884 = v883 and v883:FindFirstChild("Data Ping")
+
+									if v884 then
+										n7 = v884:GetValue() / 1000
+									end
+								end
+
+								local v885 = n7 + 0.05
+								local v886 = math.clamp(v885, 0.01, 1)
+								local AssemblyLinearVelocity = v879.AssemblyLinearVelocity
+
+								if AssemblyLinearVelocity.Magnitude < 0.5
