@@ -1,5 +1,5 @@
 --[[
-    Scripterkiddo Murder Mystery 2 Hub - FIXED LOADER
+    Scripterkiddo Murder Mystery 2 Hub
     Created by jack
     Keys: jack, siqen, prince, Mo
 ]]
@@ -43,122 +43,20 @@ local setclipboard = env.setclipboard or env.toclipboard or function() end
 local firetouchinterest = env.firetouchinterest or function() end
 
 -- ============================================================
--- FALLBACK UI LOADER (WINDUI WITH RETRY)
+-- LOAD WINDUI
 -- ============================================================
-local WindUI = nil
-local UILoaded = false
+local WindUI
+local success, err = pcall(function()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+end)
 
--- Primary URLs
-local UI_URLS = {
-    "https://raw.githubusercontent.com/Footagesus/WindUI/releases/latest/download/main.lua",
-    "https://raw.githubusercontent.com/Footagesus/WindUI/main/main.lua",
-    "https://pastebin.com/raw/9ZvKqX6x", -- Backup mirror
-}
-
-local function LoadWindUI()
-    for i, url in ipairs(UI_URLS) do
-        local success, result = pcall(function()
-            local content = game:HttpGet(url)
-            return loadstring(content)
-        end)
-        
-        if success and result then
-            local ok, ui = pcall(result)
-            if ok and ui then
-                WindUI = ui
-                UILoaded = true
-                print("[Scripterkiddo] WindUI loaded successfully from: " .. url)
-                return true
-            end
-        end
-        print("[Scripterkiddo] Failed to load WindUI from: " .. url .. " (attempt " .. i .. ")")
-        task.wait(0.5)
-    end
-    return false
+if not success then
+    error("Failed to load WindUI: " .. tostring(err))
+    return
 end
 
--- Attempt to load WindUI with retries
-local maxRetries = 3
-for attempt = 1, maxRetries do
-    if LoadWindUI() then break end
-    print("[Scripterkiddo] Retry " .. attempt .. "/" .. maxRetries .. " in 1 second...")
-    task.wait(1)
-end
-
--- ============================================================
--- FALLBACK: BASIC UI IF WINDUI FAILS
--- ============================================================
-if not UILoaded or not WindUI then
-    print("[Scripterkiddo] WindUI failed - using fallback UI")
-    
-    -- Create a simple fallback GUI
-    local FallbackGui = Instance.new("ScreenGui")
-    FallbackGui.Name = "Scripterkiddo_FallbackGUI"
-    FallbackGui.ResetOnSpawn = false
-    FallbackGui.Parent = CoreGui or localPlayer:FindFirstChildOfClass("PlayerGui")
-    
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0, 400, 0, 300)
-    MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
-    MainFrame.BackgroundTransparency = 0.1
-    MainFrame.BorderSizePixel = 0
-    MainFrame.Parent = FallbackGui
-    
-    local Corner = Instance.new("UICorner")
-    Corner.CornerRadius = UDim.new(0, 12)
-    Corner.Parent = MainFrame
-    
-    local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(1, 0, 0, 40)
-    Title.Position = UDim2.new(0, 0, 0, 5)
-    Title.BackgroundTransparency = 1
-    Title.Text = "Scripterkiddo MM2 Hub"
-    Title.TextColor3 = Color3.fromRGB(255, 215, 0)
-    Title.Font = Enum.Font.GothamBold
-    Title.TextSize = 24
-    Title.TextScaled = true
-    Title.Parent = MainFrame
-    
-    local Subtitle = Instance.new("TextLabel")
-    Subtitle.Size = UDim2.new(1, 0, 0, 30)
-    Subtitle.Position = UDim2.new(0, 0, 0, 45)
-    Subtitle.BackgroundTransparency = 1
-    Subtitle.Text = "Fallback UI - Press Right Control to toggle"
-    Subtitle.TextColor3 = Color3.fromRGB(200, 200, 200)
-    Subtitle.Font = Enum.Font.GothamMedium
-    Subtitle.TextSize = 14
-    Subtitle.TextScaled = true
-    Subtitle.Parent = MainFrame
-    
-    local StatusLabel = Instance.new("TextLabel")
-    StatusLabel.Size = UDim2.new(1, 0, 0, 30)
-    StatusLabel.Position = UDim2.new(0, 0, 0, 80)
-    StatusLabel.BackgroundTransparency = 1
-    StatusLabel.Text = "All features available"
-    StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
-    StatusLabel.Font = Enum.Font.GothamMedium
-    StatusLabel.TextSize = 14
-    StatusLabel.TextScaled = true
-    StatusLabel.Parent = MainFrame
-    
-    -- Minimal WindUI emulation
-    WindUI = {
-        Notify = function(data)
-            print("[Scripterkiddo] " .. (data.Title or "") .. ": " .. (data.Desc or data.Content or ""))
-        end,
-        CreateWindow = function()
-            return {
-                Tab = function() return {} end,
-                Tag = function() end,
-                SetToggleKey = function() end,
-                Destroy = function() FallbackGui:Destroy() end,
-            }
-        end
-    }
-    
-    print("[Scripterkiddo] Fallback UI active - features still work!")
-end
+WindUI = err
+print("WindUI loaded successfully!")
 
 -- ============================================================
 -- KEY SYSTEM
@@ -177,102 +75,79 @@ local UsedKeyString = ""
 local function RequestKeySystem()
     local authenticated = false
     
-    -- If WindUI is not fully loaded, use a simple input method
-    if not UILoaded then
-        print("[Scripterkiddo] Using fallback key input")
-        WindUI:Notify({ Title = "Scripterkiddo", Desc = "Enter key in console: /key YOURKEY" })
-        
-        -- Simple key check via chat command
-        local function CheckChat(msg)
-            if string.sub(msg, 1, 5) == "/key " then
-                local key = string.upper(string.sub(msg, 6))
-                if ValidKeys[key] then
-                    UserKeyRole = ValidKeys[key]
-                    UsedKeyString = key
-                    print("[Scripterkiddo] Key accepted: " .. UserKeyRole)
-                    authenticated = true
-                    return
-                end
-            end
-        end
-        
-        -- Listen for chat messages
-        local chatConn = nil
-        if TextChatService and TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
-            local channel = TextChatService:FindFirstChild("TextChannels") and TextChatService.TextChannels:FindFirstChild("RBXGeneral")
-            if channel then
-                chatConn = channel.MessageReceived:Connect(function(msg)
-                    CheckChat(msg.Text)
-                end)
-            end
-        else
-            local sayMsg = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents") and
-                          ReplicatedStorage.DefaultChatSystemChatEvents:FindFirstChild("SayMessageRequest")
-            if sayMsg then
-                chatConn = sayMsg.OnClientEvent:Connect(function(msg)
-                    CheckChat(msg)
-                end)
-            end
-        end
-        
-        -- Manual override
-        print("[Scripterkiddo] Type /key YOURKEY in chat to unlock features")
-        print("[Scripterkiddo] Valid keys: JACK, SIQEN, PRINCE, MO, FREE")
-        
-        -- Wait for key or timeout after 10 seconds
-        local startTime = tick()
-        while not authenticated and tick() - startTime < 10 do
-            task.wait(0.1)
-        end
-        
-        if chatConn then
-            pcall(chatConn.Disconnect, chatConn)
-        end
-        
-        if not authenticated then
-            UserKeyRole = "FREE_USER"
-            UsedKeyString = "FREE"
-            print("[Scripterkiddo] No key entered - using FREE mode")
-        end
-        
-        return
-    end
-    
-    -- Normal WindUI key system
     local KeyWindow = WindUI:CreateWindow({
         Icon = "rbxassetid://6023202357",
-        Title = "Scripterkiddo MM2 Hub | Key Verification",
+        Title = "Scripterkiddo MM2 | Key Verification",
         Author = "by jack",
         Folder = "Scripterkiddo_Key",
         Size = UDim2.fromOffset(400, 300),
         Theme = "Dark",
         Resizable = false,
         SideBarWidth = 0,
+        OpenButton = {
+            Title = "🔑",
+            Enabled = false,
+        }
     })
     
     local KeyTab = KeyWindow:Tab({ Title = "Auth", Icon = "key" })
-    KeyTab:Paragraph({ Title = "Welcome to Scripterkiddo MM2 Hub", Desc = "Enter your access key to continue." })
+    
+    KeyTab:Paragraph({
+        Title = "Welcome to Scripterkiddo MM2 Hub",
+        Desc = "Enter your access key to continue.\nKeys: JACK, SIQEN, PRINCE, MO, FREE",
+        Image = "rbxthumb://type=AvatarHeadShot&id=" .. localPlayer.UserId .. "&w=150&h=150",
+        ImageSize = 50,
+    })
+    
+    KeyTab:Divider()
     
     local enteredKey = ""
     KeyTab:Input({
         Title = "Access Key",
         Placeholder = "Enter key...",
-        Callback = function(Text) enteredKey = Text end
+        Callback = function(Text)
+            enteredKey = Text
+        end
     })
     
     KeyTab:Button({
         Title = "Verify Key",
+        Icon = "check",
         Callback = function()
             local cleanKey = string.upper(string.gsub(enteredKey, "^%s*(.-)%s*$", "%1"))
             if ValidKeys[cleanKey] then
                 UserKeyRole = ValidKeys[cleanKey]
                 UsedKeyString = cleanKey
-                WindUI:Notify({ Title = "Access Granted", Desc = "Welcome, " .. localPlayer.DisplayName .. " [" .. UserKeyRole .. "]", Type = "success" })
+                WindUI:Notify({
+                    Title = "Access Granted",
+                    Content = "Welcome, " .. localPlayer.DisplayName .. " [" .. UserKeyRole .. "]",
+                    Type = "success"
+                })
                 authenticated = true
                 KeyWindow:Destroy()
             else
-                WindUI:Notify({ Title = "Invalid Key", Desc = "Key incorrect! Please check and try again.", Type = "error" })
+                WindUI:Notify({
+                    Title = "Invalid Key",
+                    Content = "Key incorrect! Please check and try again.",
+                    Type = "error"
+                })
             end
+        end
+    })
+    
+    KeyTab:Button({
+        Title = "Use FREE Key",
+        Icon = "unlock",
+        Callback = function()
+            UserKeyRole = "FREE_USER"
+            UsedKeyString = "FREE"
+            WindUI:Notify({
+                Title = "Access Granted",
+                Content = "Welcome, " .. localPlayer.DisplayName .. " [FREE_USER]",
+                Type = "success"
+            })
+            authenticated = true
+            KeyWindow:Destroy()
         end
     })
     
@@ -281,8 +156,8 @@ local function RequestKeySystem()
     end
 end
 
--- Run key system (non-blocking in fallback mode)
-task.spawn(RequestKeySystem)
+-- Run key system
+RequestKeySystem()
 
 -- ============================================================
 -- MAIN CONFIGURATION
@@ -1203,8 +1078,7 @@ local function ExecuteSilentThrow()
     if not knife then return end
     
     local events = knife:FindFirstChild("Events")
-    if not events then return end
-    
+    if not events then return end    
     local knifeThrown = events:FindFirstChild("KnifeThrown")
     if not knifeThrown then return end
     
@@ -2031,7 +1905,7 @@ local function TeleportToMap()
 end
 
 -- ============================================================
--- FIXED SERVER HOP
+-- SERVER HOP
 -- ============================================================
 local function RejoinServer()
     TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, localPlayer)
@@ -2053,7 +1927,6 @@ local function ServerHop()
         end
     end
     
-    -- Fallback: teleport to new server
     TeleportService:Teleport(game.PlaceId, localPlayer)
 end
 
@@ -2222,942 +2095,932 @@ end
 -- ============================================================
 -- MAIN UI
 -- ============================================================
-if UILoaded and WindUI and WindUI.CreateWindow then
-    local Window = WindUI:CreateWindow({
-        Icon = "rbxassetid://6023202357",
-        Title = "Scripterkiddo MM2 Hub",
-        Author = "by jack",
-        Folder = "Scripterkiddo_MM2",
-        Size = UDim2.fromOffset(500, 550),
-        MinSize = Vector2.new(400, 400),
-        MaxSize = Vector2.new(800, 700),
-        Theme = "Dark",
-        Resizable = true,
-        SideBarWidth = 180,
-        BackgroundImageTransparency = 0.42,
-        HideSearchBar = false,
-        ScrollBarEnabled = true,
-        OpenButton = {
-            Title = "Scripterkiddo",
-            CornerRadius = UDim.new(0, 10),
-            StrokeThickness = 2,
-            Enabled = true,
-            Draggable = true,
-            OnlyMobile = true,
-            Color = ColorSequence.new(Color3.fromRGB(0, 191, 255), Color3.fromRGB(137, 247, 255)),
-            GradientEnabled = true,
-        }
-    })
-    
-    Window:Tag({
+local Window = WindUI:CreateWindow({
+    Icon = "rbxassetid://6023202357",
+    Title = "Scripterkiddo MM2 Hub",
+    Author = "by jack",
+    Folder = "Scripterkiddo_MM2",
+    Size = UDim2.fromOffset(500, 550),
+    MinSize = Vector2.new(400, 400),
+    MaxSize = Vector2.new(800, 700),
+    Theme = "Dark",
+    Resizable = true,
+    SideBarWidth = 180,
+    BackgroundImageTransparency = 0.42,
+    HideSearchBar = false,
+    ScrollBarEnabled = true,
+    OpenButton = {
         Title = "Scripterkiddo",
-        Color = Color3.fromRGB(255, 215, 0),
-        Radius = 13
-    })
-    
-    -- Tabs
-    local HomeTab = Window:Tab({ Title = "Home", Icon = "house" })
-    local MovementTab = Window:Tab({ Title = "Movement", Icon = "footprints" })
-    local CombatTab = Window:Tab({ Title = "Combat", Icon = "swords" })
-    local VisualsTab = Window:Tab({ Title = "Visuals", Icon = "eye" })
-    local FarmTab = Window:Tab({ Title = "Auto Farm", Icon = "circle-dollar-sign" })
-    local TeleportTab = Window:Tab({ Title = "Teleports", Icon = "map-pin" })
-    local MiscTab = Window:Tab({ Title = "Misc", Icon = "sparkles" })
-    local SettingsTab = Window:Tab({ Title = "Settings", Icon = "settings" })
-    
-    -- Home Tab
-    HomeTab:Paragraph({
-        Title = "Hello, " .. localPlayer.DisplayName .. "!",
-        Desc = "Welcome to Scripterkiddo Murder Mystery 2 Hub\nKey Level: " .. UserKeyRole,
-        Image = "rbxthumb://type=AvatarHeadShot&id=" .. localPlayer.UserId .. "&w=150&h=150",
-        ImageSize = 60,
-    })
-    
-    HomeTab:Divider()
-    
-    local gameStateLabel = HomeTab:Paragraph({
-        Title = "Game State: Loading...",
-        Desc = "Waiting for game data...",
-    })
-    
-    task.spawn(function()
-        while task.wait(1) do
-            pcall(function()
-                local timer = "Intermission"
-                local ok, result = pcall(function()
-                    local remotes = ReplicatedStorage:FindFirstChild("Remotes")
-                    local extras = remotes and remotes:FindFirstChild("Extras")
-                    local getTimer = extras and extras:FindFirstChild("GetTimer")
-                    if getTimer then
-                        return getTimer:InvokeServer()
-                    end
-                    return nil
-                end)
-                
-                local inProgress = false
-                if ok and type(result) == "number" and result > 0 then
-                    local mins = math.floor(result / 60)
-                    local secs = result % 60
-                    timer = string.format("%02d:%02d", mins, secs)
-                    inProgress = true
+        CornerRadius = UDim.new(0, 10),
+        StrokeThickness = 2,
+        Enabled = true,
+        Draggable = true,
+        OnlyMobile = true,
+        Color = ColorSequence.new(Color3.fromRGB(0, 191, 255), Color3.fromRGB(137, 247, 255)),
+        GradientEnabled = true,
+    }
+})
+
+Window:Tag({
+    Title = "Scripterkiddo",
+    Color = Color3.fromRGB(255, 215, 0),
+    Radius = 13
+})
+
+-- Tabs
+local HomeTab = Window:Tab({ Title = "Home", Icon = "house" })
+local MovementTab = Window:Tab({ Title = "Movement", Icon = "footprints" })
+local CombatTab = Window:Tab({ Title = "Combat", Icon = "swords" })
+local VisualsTab = Window:Tab({ Title = "Visuals", Icon = "eye" })
+local FarmTab = Window:Tab({ Title = "Auto Farm", Icon = "circle-dollar-sign" })
+local TeleportTab = Window:Tab({ Title = "Teleports", Icon = "map-pin" })
+local MiscTab = Window:Tab({ Title = "Misc", Icon = "sparkles" })
+local SettingsTab = Window:Tab({ Title = "Settings", Icon = "settings" })
+
+-- Home Tab
+HomeTab:Paragraph({
+    Title = "Hello, " .. localPlayer.DisplayName .. "!",
+    Desc = "Welcome to Scripterkiddo Murder Mystery 2 Hub\nKey Level: " .. UserKeyRole,
+    Image = "rbxthumb://type=AvatarHeadShot&id=" .. localPlayer.UserId .. "&w=150&h=150",
+    ImageSize = 60,
+})
+
+HomeTab:Divider()
+
+local gameStateLabel = HomeTab:Paragraph({
+    Title = "Game State: Loading...",
+    Desc = "Waiting for game data...",
+})
+
+task.spawn(function()
+    while task.wait(1) do
+        pcall(function()
+            local timer = "Intermission"
+            local ok, result = pcall(function()
+                local remotes = ReplicatedStorage:FindFirstChild("Remotes")
+                local extras = remotes and remotes:FindFirstChild("Extras")
+                local getTimer = extras and extras:FindFirstChild("GetTimer")
+                if getTimer then
+                    return getTimer:InvokeServer()
                 end
-                
-                local state = inProgress and "<font color='#55FF55'>In Progress</font>" or "<font color='#AAAAAA'>Intermission</font>"
-                local murderer = FindMurderer()
-                local sheriff = FindSheriff()
-                
-                gameStateLabel:SetTitle("Game State: " .. state)
-                gameStateLabel:SetDesc("<b>Timer:</b> " .. timer .. "\n<b>Murderer:</b> " .. (murderer and murderer.Name or "-") .. "\n<b>Sheriff:</b> " .. (sheriff and sheriff.Name or "-"))
+                return nil
             end)
-        end
-    end)
-    
-    HomeTab:Divider()
-    
-    HomeTab:Paragraph({
-        Title = "Scripterkiddo MM2 Hub",
-        Desc = "All features unlocked for all users!\n\nCreated by jack",
-        ThumbnailSize = 100,
-    })
-    
-    -- Movement Tab
-    local MovementSection = MovementTab:Section({
-        Title = "Movement Features",
-        Icon = "footprints",
-        Opened = true,
-    })
-    
-    MovementSection:Toggle({
-        Title = "Walk Speed",
-        Desc = "Custom walking speed",
-        Callback = ToggleWalkSpeed,
-    })
-    
-    MovementSection:Slider({
-        Title = "Walk Speed Value",
-        Value = { Min = 16, Max = 200, Default = 16 },
-        Callback = SetWalkSpeed,
-    })
-    
-    MovementSection:Divider()
-    
-    MovementSection:Toggle({
-        Title = "Jump Power",
-        Desc = "Custom jump height",
-        Callback = ToggleJumpPower,
-    })
-    
-    MovementSection:Slider({
-        Title = "Jump Power Value",
-        Value = { Min = 50, Max = 300, Default = 50 },
-        Callback = SetJumpPower,
-    })
-    
-    MovementSection:Divider()
-    
-    MovementSection:Toggle({
-        Title = "Fly Mode",
-        Desc = "Enable flying",
-        Callback = ToggleFly,
-    })
-    
-    MovementSection:Slider({
-        Title = "Fly Speed",
-        Value = { Min = 10, Max = 300, Default = 100 },
-        Callback = function(v) Config.FlySpeed = v end,
-    })
-    
-    MovementSection:Divider()
-    
-    MovementSection:Toggle({
-        Title = "Noclip",
-        Desc = "Walk through walls",
-        Callback = ToggleNoclip,
-    })
-    
-    MovementSection:Toggle({
-        Title = "Infinite Jump",
-        Desc = "Jump infinitely",
-        Callback = ToggleInfiniteJump,
-    })
-    
-    MovementSection:Divider()
-    
-    MovementSection:Button({
-        Title = "Reset Character",
-        Icon = "refresh-cw",
-        Callback = function()
-            if localPlayer.Character then
-                localPlayer.Character:BreakJoints()
+            
+            local inProgress = false
+            if ok and type(result) == "number" and result > 0 then
+                local mins = math.floor(result / 60)
+                local secs = result % 60
+                timer = string.format("%02d:%02d", mins, secs)
+                inProgress = true
             end
-        end,
-    })
-    
-    -- Combat Tab
-    local CombatSection = CombatTab:Section({
-        Title = "Combat Features",
-        Icon = "swords",
-        Opened = true,
-    })
-    
-    CombatSection:Toggle({
-        Title = "Anti-Fling",
-        Desc = "Prevent being flung",
-        Callback = ToggleAntiFling,
-    })
-    
-    CombatSection:Divider()
-    
-    CombatSection:Toggle({
-        Title = "God Mode",
-        Desc = "Invincibility",
-        Callback = ToggleGodMode,
-    })
-    
-    CombatSection:Toggle({
-        Title = "Invisible Mode",
-        Desc = "Become invisible",
-        Callback = ToggleInvisible,
-    })
-    
-    CombatSection:Divider()
-    
-    CombatSection:Button({
-        Title = "Kill All",
-        Desc = "Eliminate all players",
-        Icon = "skull",
-        Callback = KillAll,
-    })
-    
-    CombatSection:Toggle({
-        Title = "Auto Kill All",
-        Desc = "Continuously kill all",
-        Callback = ToggleAutoKillAll,
-    })
-    
-    CombatSection:Divider()
-    
-    CombatSection:Toggle({
-        Title = "Knife Aura",
-        Desc = "Auto-kill nearby players",
-        Callback = ToggleKnifeAura,
-    })
-    
-    CombatSection:Slider({
-        Title = "Knife Aura Range",
-        Value = { Min = 5, Max = 300, Default = 20 },
-        Callback = function(v) Config.KnifeAuraRange = v end,
-    })
-    
-    CombatSection:Divider()
-    
-    CombatSection:Toggle({
-        Title = "Auto Shoot Murderer",
-        Desc = "Automatically shoot the murderer",
-        Callback = ToggleAutoShootMurderer,
-    })
-    
-    CombatSection:Button({
-        Title = "Shoot Murderer",
-        Icon = "crosshair",
-        Callback = ShootMurderer,
-    })
-    
-    CombatSection:Divider()
-    
-    CombatSection:Toggle({
-        Title = "Auto Wallbang",
-        Desc = "Shoot through walls automatically",
-        Callback = ToggleWallbang,
-    })
-    
-    CombatSection:Button({
-        Title = "Wallbang Shoot",
-        Icon = "crosshair",
-        Callback = WallbangShoot,
-    })
-    
-    CombatSection:Divider()
-    
-    CombatSection:Toggle({
-        Title = "Auto Silent Throw",
-        Desc = "Auto-throw knife at nearest player",
-        Callback = ToggleSilentThrow,
-    })
-    
-    CombatSection:Button({
-        Title = "Silent Throw",
-        Icon = "zap",
-        Callback = ExecuteSilentThrow,
-    })
-    
-    CombatSection:Divider()
-    
-    CombatSection:Toggle({
-        Title = "Auto Grab Gun",
-        Desc = "Auto-pickup dropped gun",
-        Callback = ToggleAutoGrabGun,
-    })
-    
-    CombatSection:Button({
-        Title = "Grab Gun",
-        Icon = "hand",
-        Callback = GrabGun,
-    })
-    
-    -- Visuals Tab
-    local VisualsSection = VisualsTab:Section({
-        Title = "Visual Enhancements",
-        Icon = "eye",
-        Opened = true,
-    })
-    
-    VisualsSection:Colorpicker({
-        Title = "Murderer ESP Color",
-        Default = Config.ESPColorMurderer,
-        Callback = function(v) Config.ESPColorMurderer = v end,
-    })
-    
-    VisualsSection:Toggle({
-        Title = "Murderer Chams",
-        Callback = function(v) Config.HighlightMurderer = v end,
-    })
-    
-    VisualsSection:Toggle({
-        Title = "Murderer Name & Info",
-        Callback = function(v) Config.InfoMurderer = v end,
-    })
-    
-    VisualsSection:Divider()
-    
-    VisualsSection:Colorpicker({
-        Title = "Sheriff ESP Color",
-        Default = Config.ESPColorSheriff,
-        Callback = function(v) Config.ESPColorSheriff = v end,
-    })
-    
-    VisualsSection:Toggle({
-        Title = "Sheriff Chams",
-        Callback = function(v) Config.HighlightSheriff = v end,
-    })
-    
-    VisualsSection:Toggle({
-        Title = "Sheriff Name & Info",
-        Callback = function(v) Config.InfoSheriff = v end,
-    })
-    
-    VisualsSection:Divider()
-    
-    VisualsSection:Colorpicker({
-        Title = "Innocent ESP Color",
-        Default = Config.ESPColorInnocent,
-        Callback = function(v) Config.ESPColorInnocent = v end,
-    })
-    
-    VisualsSection:Toggle({
-        Title = "Innocent Chams",
-        Callback = function(v) Config.HighlightInnocent = v end,
-    })
-    
-    VisualsSection:Toggle({
-        Title = "Innocent Name & Info",
-        Callback = function(v) Config.InfoInnocent = v end,
-    })
-    
-    VisualsSection:Divider()
-    
-    VisualsSection:Toggle({
-        Title = "Round Timer",
-        Desc = "Show round timer on screen",
-        Callback = ToggleRoundTimer,
-    })
-    
-    VisualsSection:Toggle({
-        Title = "Dropped Gun ESP",
-        Desc = "Highlight dropped gun",
-        Callback = function(v) Config.ESPGunDropped = v end,
-    })
-    
-    VisualsSection:Toggle({
-        Title = "Gun Drop Notification",
-        Desc = "Alert when gun drops",
-        Callback = ToggleGunDropNotification,
-    })
-    
-    VisualsSection:Toggle({
-        Title = "Murderer Notification",
-        Desc = "Alert when murderer is identified",
-        Callback = function(v)
-            Config.NotifyMurderer = v
-            ToggleRoleNotifications(true)
-        end,
-    })
-    
-    VisualsSection:Toggle({
-        Title = "Sheriff Notification",
-        Desc = "Alert when sheriff is identified",
-        Callback = function(v)
-            Config.NotifySheriff = v
-            ToggleRoleNotifications(true)
-        end,
-    })
-    
-    -- Auto Farm Tab
-    local FarmSection = FarmTab:Section({
-        Title = "Auto Farming",
-        Icon = "circle-dollar-sign",
-        Opened = true,
-    })
-    
-    FarmSection:Toggle({
-        Title = "Enable Auto Coin Farm",
-        Desc = "Automatically collect coins",
-        Callback = ToggleAutoFarm,
-    })
-    
-    FarmSection:Divider()
-    
-    FarmSection:Slider({
-        Title = "Travel Speed",
-        Value = { Min = 0, Max = 25, Default = 25, Step = 1 },
-        Callback = function(v) Config.AutoFarmSpeed = v end,
-    })
-    
-    FarmSection:Slider({
-        Title = "Height Offset",
-        Value = { Min = -6, Max = 0, Default = -5, Step = 1 },
-        Callback = function(v) Config.AutoFarmOffset = v end,
-    })
-    
-    FarmSection:Slider({
-        Title = "Search Radius",
-        Value = { Min = 100, Max = 10000, Default = 3000, Step = 50 },
-        Callback = function(v) Config.AutoFarmRadius = v end,
-    })
-    
-    FarmSection:Slider({
-        Title = "Pickup Delay",
-        Value = { Min = 0, Max = 2, Default = 0.1, Step = 0.05 },
-        Callback = function(v) Config.AutoFarmDelay = v end,
-    })
-    
-    -- Teleport Tab
-    local TeleportSection = TeleportTab:Section({
-        Title = "Teleport Options",
-        Icon = "map-pin",
-        Opened = true,
-    })
-    
-    local selectedPlayer = nil
-    local playerDropdown = TeleportSection:Dropdown({
-        Title = "Select Player",
-        Desc = "Choose a player to teleport to",
-        Values = {},
-        AllowNone = true,
-        Callback = function(v)
-            if not v then
-                selectedPlayer = nil
-                return
-            end
-            selectedPlayer = Players:FindFirstChild(v.Title)
-        end,
-    })
-    
-    local function RefreshPlayers()
-        local list = {}
-        for _, player in ipairs(Players:GetPlayers()) do
-            if player ~= localPlayer then
-                table.insert(list, {
-                    Title = player.Name,
-                    Icon = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
-                })
-            end
-        end
-        playerDropdown:Refresh(list)
-    end
-    
-    RefreshPlayers()
-    Players.PlayerAdded:Connect(RefreshPlayers)
-    Players.PlayerRemoving:Connect(RefreshPlayers)
-    
-    TeleportSection:Button({
-        Title = "Teleport to Selected Player",
-        Icon = "arrow-right",
-        Callback = function()
-            if selectedPlayer then
-                TeleportToPlayer(selectedPlayer)
-            end
-        end,
-    })
-    
-    TeleportSection:Divider()
-    
-    TeleportSection:Button({
-        Title = "Teleport to Murderer",
-        Icon = "skull",
-        Callback = function()
+            
+            local state = inProgress and "<font color='#55FF55'>In Progress</font>" or "<font color='#AAAAAA'>Intermission</font>"
             local murderer = FindMurderer()
-            if murderer then
-                TeleportToPlayer(murderer)
-            end
-        end,
-    })
-    
-    TeleportSection:Button({
-        Title = "Teleport to Sheriff",
-        Icon = "shield",
-        Callback = function()
             local sheriff = FindSheriff()
-            if sheriff then
-                TeleportToPlayer(sheriff)
-            end
-        end,
-    })
-    
-    TeleportSection:Divider()
-    
-    TeleportSection:Button({
-        Title = "Teleport to Lobby",
-        Icon = "house",
-        Callback = TeleportToLobby,
-    })
-    
-    TeleportSection:Button({
-        Title = "Teleport to Map",
-        Icon = "map",
-        Callback = TeleportToMap,
-    })
-    
-    -- Misc Tab
-    local MiscSection = MiscTab:Section({
-        Title = "Miscellaneous",
-        Icon = "sparkles",
-        Opened = true,
-    })
-    
-    local flingPlayer = nil
-    local flingDropdown = MiscSection:Dropdown({
-        Title = "Select Player to Fling",
-        Values = {},
-        AllowNone = true,
-        Callback = function(v)
-            if not v then
-                flingPlayer = nil
-                return
-            end
-            flingPlayer = Players:FindFirstChild(v.Title)
-        end,
-    })
-    
-    local function RefreshFlingPlayers()
-        local list = {}
-        for _, player in ipairs(Players:GetPlayers()) do
-            if player ~= localPlayer then
-                table.insert(list, {
-                    Title = player.Name,
-                    Icon = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
-                })
-            end
-        end
-        flingDropdown:Refresh(list)
+            
+            gameStateLabel:SetTitle("Game State: " .. state)
+            gameStateLabel:SetDesc("<b>Timer:</b> " .. timer .. "\n<b>Murderer:</b> " .. (murderer and murderer.Name or "-") .. "\n<b>Sheriff:</b> " .. (sheriff and sheriff.Name or "-"))
+        end)
     end
-    
-    RefreshFlingPlayers()
-    Players.PlayerAdded:Connect(RefreshFlingPlayers)
-    Players.PlayerRemoving:Connect(RefreshFlingPlayers)
-    
-    MiscSection:Button({
-        Title = "Fling Selected Player",
-        Icon = "wind",
-        Callback = function()
-            if flingPlayer then
-                FlingTarget(flingPlayer)
-            end
-        end,
-    })
-    
-    MiscSection:Button({
-        Title = "Fling All Players",
-        Icon = "wind",
-        Callback = function()
-            for _, player in ipairs(Players:GetPlayers()) do
-                if player ~= localPlayer then
-                    FlingTarget(player)
-                end
-            end
-        end,
-    })
-    
-    MiscSection:Button({
-        Title = "Fling Murderer",
-        Icon = "skull",
-        Callback = function()
-            local murderer = FindMurderer()
-            if murderer then
-                FlingTarget(murderer)
-            end
-        end,
-    })
-    
-    MiscSection:Button({
-        Title = "Fling Sheriff",
-        Icon = "shield",
-        Callback = function()
-            local sheriff = FindSheriff()
-            if sheriff then
-                FlingTarget(sheriff)
-            end
-        end,
-    })
-    
-    MiscSection:Divider()
-    
-    local selectedEmote = nil
-    MiscSection:Dropdown({
-        Title = "Emote Selector",
-        Values = { "sit", "zombie", "ninja", "zen", "floss", "dab" },
-        Callback = function(v)
-            selectedEmote = v
-        end,
-    })
-    
-    MiscSection:Button({
-        Title = "Play Selected Emote",
-        Icon = "play",
-        Callback = function()
-            if selectedEmote then
-                PlayEmote(selectedEmote)
-            end
-        end,
-    })
-    
-    MiscSection:Divider()
-    
-    MiscSection:Button({
-        Title = "Expose Roles in Chat",
-        Icon = "megaphone",
-        Callback = ChatRoles,
-    })
-    
-    MiscSection:Toggle({
-        Title = "Anti-AFK",
-        Desc = "Prevent disconnection",
-        Callback = ToggleAntiAFK,
-    })
-    
-    MiscSection:Divider()
-    
-    MiscSection:Button({
-        Title = "Rejoin Server",
-        Icon = "refresh-cw",
-        Callback = RejoinServer,
-    })
-    
-    MiscSection:Button({
-        Title = "Server Hop",
-        Icon = "shuffle",
-        Callback = ServerHop,
-    })
-    
-    -- Settings Tab
-    local SettingsSection = SettingsTab:Section({
-        Title = "Settings",
-        Icon = "settings",
-        Opened = true,
-    })
-    
-    SettingsSection:Paragraph({
-        Title = "UI Settings",
-        Desc = "Configure the interface",
-    })
-    
-    SettingsSection:Keybind({
-        Title = "UI Toggle Key",
-        Value = "RightControl",
-        Callback = function(key)
-            local keyEnum = typeof(key) == "EnumItem" and key or Enum.KeyCode[key]
-            if keyEnum then
-                Window:SetToggleKey(keyEnum)
-            end
-        end,
-    })
-    
-    SettingsSection:Divider()
-    
-    SettingsSection:Toggle({
-        Title = "Buttons Locked",
-        Desc = "Lock on-screen button positions",
-        Value = true,
-        Callback = function(v)
-            Config.ButtonsLocked = v
-        end,
-    })
-    
-    SettingsSection:Divider()
-    
-    SettingsSection:SubSection({
-        Title = "On-Screen Buttons",
-        Icon = "list",
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Shoot Button",
-        Callback = function(v)
-            CreateGuiButton("Shoot", {
-                Enabled = v,
-                Type = "Image",
-                Icon = "rbxassetid://139650104834071",
-            }, ShootMurderer)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Wallbang Button",
-        Callback = function(v)
-            CreateGuiButton("Wallbang", {
-                Enabled = v,
-                Type = "Text",
-                Text = "WallBang",
-            }, WallbangShoot)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Invisible Button",
-        Callback = function(v)
-            CreateGuiButton("Invisible", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Invisible",
-            }, function()
-                Config.Invisible = not Config.Invisible
-                ToggleInvisible(Config.Invisible)
-            end)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Kill All Button",
-        Callback = function(v)
-            CreateGuiButton("KillAll", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Kill All",
-            }, KillAll)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Silent Throw Button",
-        Callback = function(v)
-            CreateGuiButton("SilentThrow", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Silent Throw",
-            }, ExecuteSilentThrow)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Fling Murderer Button",
-        Callback = function(v)
-            CreateGuiButton("FlingMurderer", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Fling Murderer",
-            }, function()
-                local murderer = FindMurderer()
-                if murderer then FlingTarget(murderer) end
-            end)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Fling Sheriff Button",
-        Callback = function(v)
-            CreateGuiButton("FlingSheriff", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Fling Sheriff",
-            }, function()
-                local sheriff = FindSheriff()
-                if sheriff then FlingTarget(sheriff) end
-            end)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Grab Gun Button",
-        Callback = function(v)
-            CreateGuiButton("GrabGun", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Grab Gun",
-            }, GrabGun)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Teleport to Map Button",
-        Callback = function(v)
-            CreateGuiButton("TPMap", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Map TP",
-            }, TeleportToMap)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Teleport to Lobby Button",
-        Callback = function(v)
-            CreateGuiButton("TPLobby", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Lobby TP",
-            }, TeleportToLobby)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Fly Button",
-        Callback = function(v)
-            CreateGuiButton("Fly", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Fly",
-            }, function()
-                Config.FlyEnabled = not Config.FlyEnabled
-                ToggleFly(Config.FlyEnabled)
-            end)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Noclip Button",
-        Callback = function(v)
-            CreateGuiButton("Noclip", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Noclip",
-            }, function()
-                Config.Noclip = not Config.Noclip
-                ToggleNoclip(Config.Noclip)
-            end)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Expose Roles Button",
-        Callback = function(v)
-            CreateGuiButton("ExposeRoles", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Expose Roles",
-            }, ChatRoles)
-        end,
-    })
-    
-    SettingsSection:Divider()
-    
-    SettingsSection:SubSection({
-        Title = "Emote Buttons",
-        Icon = "smile",
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Sit Button",
-        Callback = function(v)
-            CreateGuiButton("Sit", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Sit",
-            }, function() PlayEmote("sit") end)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Floss Button",
-        Callback = function(v)
-            CreateGuiButton("Floss", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Floss",
-            }, function() PlayEmote("floss") end)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Dab Button",
-        Callback = function(v)
-            CreateGuiButton("Dab", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Dab",
-            }, function() PlayEmote("dab") end)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Zombie Button",
-        Callback = function(v)
-            CreateGuiButton("Zombie", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Zombie",
-            }, function() PlayEmote("zombie") end)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Ninja Button",
-        Callback = function(v)
-            CreateGuiButton("Ninja", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Ninja",
-            }, function() PlayEmote("ninja") end)
-        end,
-    })
-    
-    SettingsSection:Toggle({
-        Title = "Zen Button",
-        Callback = function(v)
-            CreateGuiButton("Zen", {
-                Enabled = v,
-                Type = "Text",
-                Text = "Zen",
-            }, function() PlayEmote("zen") end)
-        end,
-    })
-    
-    SettingsSection:Divider()
-    
-    SettingsSection:Button({
-        Title = "Unload Script",
-        Icon = "power",
-        Callback = function()
-            Cleanup()
-            Window:Destroy()
-        end,
-    })
-    
-    -- Startup Notification
-    WindUI:Notify({
-        Title = "Scripterkiddo MM2 Hub Loaded",
-        Content = "Press Right Control to toggle the UI",
-        Type = "success",
-        Duration = 5,
-    })
-else
-    -- Fallback: print instructions to console
-    print("==========================================")
-    print("Scripterkiddo MM2 Hub Loaded (Fallback Mode)")
-    print("All features are active!")
-    print("Key: " .. UserKeyRole)
-    print("Type /key YOURKEY in chat to change")
-    print("==========================================")
+end)
+
+HomeTab:Divider()
+
+HomeTab:Paragraph({
+    Title = "Scripterkiddo MM2 Hub",
+    Desc = "All features unlocked for all users!\n\nCreated by jack",
+    ThumbnailSize = 100,
+})
+
+-- Movement Tab
+local MovementSection = MovementTab:Section({
+    Title = "Movement Features",
+    Icon = "footprints",
+    Opened = true,
+})
+
+MovementSection:Toggle({
+    Title = "Walk Speed",
+    Desc = "Custom walking speed",
+    Callback = ToggleWalkSpeed,
+})
+
+MovementSection:Slider({
+    Title = "Walk Speed Value",
+    Value = { Min = 16, Max = 200, Default = 16 },
+    Callback = SetWalkSpeed,
+})
+
+MovementSection:Divider()
+
+MovementSection:Toggle({
+    Title = "Jump Power",
+    Desc = "Custom jump height",
+    Callback = ToggleJumpPower,
+})
+
+MovementSection:Slider({
+    Title = "Jump Power Value",
+    Value = { Min = 50, Max = 300, Default = 50 },
+    Callback = SetJumpPower,
+})
+
+MovementSection:Divider()
+
+MovementSection:Toggle({
+    Title = "Fly Mode",
+    Desc = "Enable flying",
+    Callback = ToggleFly,
+})
+
+MovementSection:Slider({
+    Title = "Fly Speed",
+    Value = { Min = 10, Max = 300, Default = 100 },
+    Callback = function(v) Config.FlySpeed = v end,
+})
+
+MovementSection:Divider()
+
+MovementSection:Toggle({
+    Title = "Noclip",
+    Desc = "Walk through walls",
+    Callback = ToggleNoclip,
+})
+
+MovementSection:Toggle({
+    Title = "Infinite Jump",
+    Desc = "Jump infinitely",
+    Callback = ToggleInfiniteJump,
+})
+
+MovementSection:Divider()
+
+MovementSection:Button({
+    Title = "Reset Character",
+    Icon = "refresh-cw",
+    Callback = function()
+        if localPlayer.Character then
+            localPlayer.Character:BreakJoints()
+        end
+    end,
+})
+
+-- Combat Tab
+local CombatSection = CombatTab:Section({
+    Title = "Combat Features",
+    Icon = "swords",
+    Opened = true,
+})
+
+CombatSection:Toggle({
+    Title = "Anti-Fling",
+    Desc = "Prevent being flung",
+    Callback = ToggleAntiFling,
+})
+
+CombatSection:Divider()
+
+CombatSection:Toggle({
+    Title = "God Mode",
+    Desc = "Invincibility",
+    Callback = ToggleGodMode,
+})
+
+CombatSection:Toggle({
+    Title = "Invisible Mode",
+    Desc = "Become invisible",
+    Callback = ToggleInvisible,
+})
+
+CombatSection:Divider()
+
+CombatSection:Button({
+    Title = "Kill All",
+    Desc = "Eliminate all players",
+    Icon = "skull",
+    Callback = KillAll,
+})
+
+CombatSection:Toggle({
+    Title = "Auto Kill All",
+    Desc = "Continuously kill all",
+    Callback = ToggleAutoKillAll,
+})
+
+CombatSection:Divider()
+
+CombatSection:Toggle({
+    Title = "Knife Aura",
+    Desc = "Auto-kill nearby players",
+    Callback = ToggleKnifeAura,
+})
+
+CombatSection:Slider({
+    Title = "Knife Aura Range",
+    Value = { Min = 5, Max = 300, Default = 20 },
+    Callback = function(v) Config.KnifeAuraRange = v end,
+})
+
+CombatSection:Divider()
+
+CombatSection:Toggle({
+    Title = "Auto Shoot Murderer",
+    Desc = "Automatically shoot the murderer",
+    Callback = ToggleAutoShootMurderer,
+})
+
+CombatSection:Button({
+    Title = "Shoot Murderer",
+    Icon = "crosshair",
+    Callback = ShootMurderer,
+})
+
+CombatSection:Divider()
+
+CombatSection:Toggle({
+    Title = "Auto Wallbang",
+    Desc = "Shoot through walls automatically",
+    Callback = ToggleWallbang,
+})
+
+CombatSection:Button({
+    Title = "Wallbang Shoot",
+    Icon = "crosshair",
+    Callback = WallbangShoot,
+})
+
+CombatSection:Divider()
+
+CombatSection:Toggle({
+    Title = "Auto Silent Throw",
+    Desc = "Auto-throw knife at nearest player",
+    Callback = ToggleSilentThrow,
+})
+
+CombatSection:Button({
+    Title = "Silent Throw",
+    Icon = "zap",
+    Callback = ExecuteSilentThrow,
+})
+
+CombatSection:Divider()
+
+CombatSection:Toggle({
+    Title = "Auto Grab Gun",
+    Desc = "Auto-pickup dropped gun",
+    Callback = ToggleAutoGrabGun,
+})
+
+CombatSection:Button({
+    Title = "Grab Gun",
+    Icon = "hand",
+    Callback = GrabGun,
+})
+
+-- Visuals Tab
+local VisualsSection = VisualsTab:Section({
+    Title = "Visual Enhancements",
+    Icon = "eye",
+    Opened = true,
+})
+
+VisualsSection:Colorpicker({
+    Title = "Murderer ESP Color",
+    Default = Config.ESPColorMurderer,
+    Callback = function(v) Config.ESPColorMurderer = v end,
+})
+
+VisualsSection:Toggle({
+    Title = "Murderer Chams",
+    Callback = function(v) Config.HighlightMurderer = v end,
+})
+
+VisualsSection:Toggle({
+    Title = "Murderer Name & Info",
+    Callback = function(v) Config.InfoMurderer = v end,
+})
+
+VisualsSection:Divider()
+
+VisualsSection:Colorpicker({
+    Title = "Sheriff ESP Color",
+    Default = Config.ESPColorSheriff,
+    Callback = function(v) Config.ESPColorSheriff = v end,
+})
+
+VisualsSection:Toggle({
+    Title = "Sheriff Chams",
+    Callback = function(v) Config.HighlightSheriff = v end,
+})
+
+VisualsSection:Toggle({
+    Title = "Sheriff Name & Info",
+    Callback = function(v) Config.InfoSheriff = v end,
+})
+
+VisualsSection:Divider()
+
+VisualsSection:Colorpicker({
+    Title = "Innocent ESP Color",
+    Default = Config.ESPColorInnocent,
+    Callback = function(v) Config.ESPColorInnocent = v end,
+})
+
+VisualsSection:Toggle({
+    Title = "Innocent Chams",
+    Callback = function(v) Config.HighlightInnocent = v end,
+})
+
+VisualsSection:Toggle({
+    Title = "Innocent Name & Info",
+    Callback = function(v) Config.InfoInnocent = v end,
+})
+
+VisualsSection:Divider()
+
+VisualsSection:Toggle({
+    Title = "Round Timer",
+    Desc = "Show round timer on screen",
+    Callback = ToggleRoundTimer,
+})
+
+VisualsSection:Toggle({
+    Title = "Dropped Gun ESP",
+    Desc = "Highlight dropped gun",
+    Callback = function(v) Config.ESPGunDropped = v end,
+})
+
+VisualsSection:Toggle({
+    Title = "Gun Drop Notification",
+    Desc = "Alert when gun drops",
+    Callback = ToggleGunDropNotification,
+})
+
+VisualsSection:Toggle({
+    Title = "Murderer Notification",
+    Desc = "Alert when murderer is identified",
+    Callback = function(v)
+        Config.NotifyMurderer = v
+        ToggleRoleNotifications(true)
+    end,
+})
+
+VisualsSection:Toggle({
+    Title = "Sheriff Notification",
+    Desc = "Alert when sheriff is identified",
+    Callback = function(v)
+        Config.NotifySheriff = v
+        ToggleRoleNotifications(true)
+    end,
+})
+
+-- Auto Farm Tab
+local FarmSection = FarmTab:Section({
+    Title = "Auto Farming",
+    Icon = "circle-dollar-sign",
+    Opened = true,
+})
+
+FarmSection:Toggle({
+    Title = "Enable Auto Coin Farm",
+    Desc = "Automatically collect coins",
+    Callback = ToggleAutoFarm,
+})
+
+FarmSection:Divider()
+
+FarmSection:Slider({
+    Title = "Travel Speed",
+    Value = { Min = 0, Max = 25, Default = 25, Step = 1 },
+    Callback = function(v) Config.AutoFarmSpeed = v end,
+})
+
+FarmSection:Slider({
+    Title = "Height Offset",
+    Value = { Min = -6, Max = 0, Default = -5, Step = 1 },
+    Callback = function(v) Config.AutoFarmOffset = v end,
+})
+
+FarmSection:Slider({
+    Title = "Search Radius",
+    Value = { Min = 100, Max = 10000, Default = 3000, Step = 50 },
+    Callback = function(v) Config.AutoFarmRadius = v end,
+})
+
+FarmSection:Slider({
+    Title = "Pickup Delay",
+    Value = { Min = 0, Max = 2, Default = 0.1, Step = 0.05 },
+    Callback = function(v) Config.AutoFarmDelay = v end,
+})
+
+-- Teleport Tab
+local TeleportSection = TeleportTab:Section({
+    Title = "Teleport Options",
+    Icon = "map-pin",
+    Opened = true,
+})
+
+local selectedPlayer = nil
+local playerDropdown = TeleportSection:Dropdown({
+    Title = "Select Player",
+    Desc = "Choose a player to teleport to",
+    Values = {},
+    AllowNone = true,
+    Callback = function(v)
+        if not v then
+            selectedPlayer = nil
+            return
+        end
+        selectedPlayer = Players:FindFirstChild(v.Title)
+    end,
+})
+
+local function RefreshPlayers()
+    local list = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= localPlayer then
+            table.insert(list, {
+                Title = player.Name,
+                Icon = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
+            })
+        end
+    end
+    playerDropdown:Refresh(list)
 end
+
+RefreshPlayers()
+Players.PlayerAdded:Connect(RefreshPlayers)
+Players.PlayerRemoving:Connect(RefreshPlayers)
+
+TeleportSection:Button({
+    Title = "Teleport to Selected Player",
+    Icon = "arrow-right",
+    Callback = function()
+        if selectedPlayer then
+            TeleportToPlayer(selectedPlayer)
+        end
+    end,
+})
+
+TeleportSection:Divider()
+
+TeleportSection:Button({
+    Title = "Teleport to Murderer",
+    Icon = "skull",
+    Callback = function()
+        local murderer = FindMurderer()
+        if murderer then
+            TeleportToPlayer(murderer)
+        end
+    end,
+})
+
+TeleportSection:Button({
+    Title = "Teleport to Sheriff",
+    Icon = "shield",
+    Callback = function()
+        local sheriff = FindSheriff()
+        if sheriff then
+            TeleportToPlayer(sheriff)
+        end
+    end,
+})
+
+TeleportSection:Divider()
+
+TeleportSection:Button({
+    Title = "Teleport to Lobby",
+    Icon = "house",
+    Callback = TeleportToLobby,
+})
+
+TeleportSection:Button({
+    Title = "Teleport to Map",
+    Icon = "map",
+    Callback = TeleportToMap,
+})
+
+-- Misc Tab
+local MiscSection = MiscTab:Section({
+    Title = "Miscellaneous",
+    Icon = "sparkles",
+    Opened = true,
+})
+
+local flingPlayer = nil
+local flingDropdown = MiscSection:Dropdown({
+    Title = "Select Player to Fling",
+    Values = {},
+    AllowNone = true,
+    Callback = function(v)
+        if not v then
+            flingPlayer = nil
+            return
+        end
+        flingPlayer = Players:FindFirstChild(v.Title)
+    end,
+})
+
+local function RefreshFlingPlayers()
+    local list = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= localPlayer then
+            table.insert(list, {
+                Title = player.Name,
+                Icon = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
+            })
+        end
+    end
+    flingDropdown:Refresh(list)
+end
+
+RefreshFlingPlayers()
+Players.PlayerAdded:Connect(RefreshFlingPlayers)
+Players.PlayerRemoving:Connect(RefreshFlingPlayers)
+
+MiscSection:Button({
+    Title = "Fling Selected Player",
+    Icon = "wind",
+    Callback = function()
+        if flingPlayer then
+            FlingTarget(flingPlayer)
+        end
+    end,
+})
+
+MiscSection:Button({
+    Title = "Fling All Players",
+    Icon = "wind",
+    Callback = function()
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= localPlayer then
+                FlingTarget(player)
+            end
+        end
+    end,
+})
+
+MiscSection:Button({
+    Title = "Fling Murderer",
+    Icon = "skull",
+    Callback = function()
+        local murderer = FindMurderer()
+        if murderer then
+            FlingTarget(murderer)
+        end
+    end,
+})
+
+MiscSection:Button({
+    Title = "Fling Sheriff",
+    Icon = "shield",
+    Callback = function()
+        local sheriff = FindSheriff()
+        if sheriff then
+            FlingTarget(sheriff)
+        end
+    end,
+})
+
+MiscSection:Divider()
+
+local selectedEmote = nil
+MiscSection:Dropdown({
+    Title = "Emote Selector",
+    Values = { "sit", "zombie", "ninja", "zen", "floss", "dab" },
+    Callback = function(v)
+        selectedEmote = v
+    end,
+})
+
+MiscSection:Button({
+    Title = "Play Selected Emote",
+    Icon = "play",
+    Callback = function()
+        if selectedEmote then
+            PlayEmote(selectedEmote)
+        end
+    end,
+})
+
+MiscSection:Divider()
+
+MiscSection:Button({
+    Title = "Expose Roles in Chat",
+    Icon = "megaphone",
+    Callback = ChatRoles,
+})
+
+MiscSection:Toggle({
+    Title = "Anti-AFK",
+    Desc = "Prevent disconnection",
+    Callback = ToggleAntiAFK,
+})
+
+MiscSection:Divider()
+
+MiscSection:Button({
+    Title = "Rejoin Server",
+    Icon = "refresh-cw",
+    Callback = RejoinServer,
+})
+
+MiscSection:Button({
+    Title = "Server Hop",
+    Icon = "shuffle",
+    Callback = ServerHop,
+})
+
+-- Settings Tab
+local SettingsSection = SettingsTab:Section({
+    Title = "Settings",
+    Icon = "settings",
+    Opened = true,
+})
+
+SettingsSection:Paragraph({
+    Title = "UI Settings",
+    Desc = "Configure the interface",
+})
+
+SettingsSection:Keybind({
+    Title = "UI Toggle Key",
+    Value = "RightControl",
+    Callback = function(key)
+        local keyEnum = typeof(key) == "EnumItem" and key or Enum.KeyCode[key]
+        if keyEnum then
+            Window:SetToggleKey(keyEnum)
+        end
+    end,
+})
+
+SettingsSection:Divider()
+
+SettingsSection:Toggle({
+    Title = "Buttons Locked",
+    Desc = "Lock on-screen button positions",
+    Value = true,
+    Callback = function(v)
+        Config.ButtonsLocked = v
+    end,
+})
+
+SettingsSection:Divider()
+
+SettingsSection:SubSection({
+    Title = "On-Screen Buttons",
+    Icon = "list",
+})
+
+SettingsSection:Toggle({
+    Title = "Shoot Button",
+    Callback = function(v)
+        CreateGuiButton("Shoot", {
+            Enabled = v,
+            Type = "Image",
+            Icon = "rbxassetid://139650104834071",
+        }, ShootMurderer)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Wallbang Button",
+    Callback = function(v)
+        CreateGuiButton("Wallbang", {
+            Enabled = v,
+            Type = "Text",
+            Text = "WallBang",
+        }, WallbangShoot)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Invisible Button",
+    Callback = function(v)
+        CreateGuiButton("Invisible", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Invisible",
+        }, function()
+            Config.Invisible = not Config.Invisible
+            ToggleInvisible(Config.Invisible)
+        end)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Kill All Button",
+    Callback = function(v)
+        CreateGuiButton("KillAll", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Kill All",
+        }, KillAll)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Silent Throw Button",
+    Callback = function(v)
+        CreateGuiButton("SilentThrow", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Silent Throw",
+        }, ExecuteSilentThrow)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Fling Murderer Button",
+    Callback = function(v)
+        CreateGuiButton("FlingMurderer", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Fling Murderer",
+        }, function()
+            local murderer = FindMurderer()
+            if murderer then FlingTarget(murderer) end
+        end)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Fling Sheriff Button",
+    Callback = function(v)
+        CreateGuiButton("FlingSheriff", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Fling Sheriff",
+        }, function()
+            local sheriff = FindSheriff()
+            if sheriff then FlingTarget(sheriff) end
+        end)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Grab Gun Button",
+    Callback = function(v)
+        CreateGuiButton("GrabGun", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Grab Gun",
+        }, GrabGun)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Teleport to Map Button",
+    Callback = function(v)
+        CreateGuiButton("TPMap", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Map TP",
+        }, TeleportToMap)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Teleport to Lobby Button",
+    Callback = function(v)
+        CreateGuiButton("TPLobby", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Lobby TP",
+        }, TeleportToLobby)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Fly Button",
+    Callback = function(v)
+        CreateGuiButton("Fly", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Fly",
+        }, function()
+            Config.FlyEnabled = not Config.FlyEnabled
+            ToggleFly(Config.FlyEnabled)
+        end)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Noclip Button",
+    Callback = function(v)
+        CreateGuiButton("Noclip", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Noclip",
+        }, function()
+            Config.Noclip = not Config.Noclip
+            ToggleNoclip(Config.Noclip)
+        end)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Expose Roles Button",
+    Callback = function(v)
+        CreateGuiButton("ExposeRoles", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Expose Roles",
+        }, ChatRoles)
+    end,
+})
+
+SettingsSection:Divider()
+
+SettingsSection:SubSection({
+    Title = "Emote Buttons",
+    Icon = "smile",
+})
+
+SettingsSection:Toggle({
+    Title = "Sit Button",
+    Callback = function(v)
+        CreateGuiButton("Sit", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Sit",
+        }, function() PlayEmote("sit") end)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Floss Button",
+    Callback = function(v)
+        CreateGuiButton("Floss", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Floss",
+        }, function() PlayEmote("floss") end)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Dab Button",
+    Callback = function(v)
+        CreateGuiButton("Dab", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Dab",
+        }, function() PlayEmote("dab") end)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Zombie Button",
+    Callback = function(v)
+        CreateGuiButton("Zombie", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Zombie",
+        }, function() PlayEmote("zombie") end)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Ninja Button",
+    Callback = function(v)
+        CreateGuiButton("Ninja", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Ninja",
+        }, function() PlayEmote("ninja") end)
+    end,
+})
+
+SettingsSection:Toggle({
+    Title = "Zen Button",
+    Callback = function(v)
+        CreateGuiButton("Zen", {
+            Enabled = v,
+            Type = "Text",
+            Text = "Zen",
+        }, function() PlayEmote("zen") end)
+    end,
+})
+
+SettingsSection:Divider()
+
+SettingsSection:Button({
+    Title = "Unload Script",
+    Icon = "power",
+    Callback = function()
+        Cleanup()
+        Window:Destroy()
+    end,
+})
+
+-- Startup Notification
+WindUI:Notify({
+    Title = "Scripterkiddo MM2 Hub Loaded",
+    Content = "Press Right Control to toggle the UI",
+    Type = "success",
+    Duration = 5,
+})
 
 -- ============================================================
 -- RETURN
