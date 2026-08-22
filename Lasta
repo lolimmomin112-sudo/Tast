@@ -1,7 +1,7 @@
 --[[
     Scripterkiddo Murder Mystery 2 Hub
     Created by jack
-    Keys: jack, siqen, prince, Mo
+    NO KEY VERIFICATION - All features unlocked
 ]]
 
 if not game:IsLoaded() then
@@ -54,7 +54,6 @@ local success, result = pcall(function()
 end)
 
 if not success then
-    -- Fallback to raw dist
     local ok2, result2 = pcall(function()
         return loadstring(game:HttpGet(
             "https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"
@@ -70,107 +69,6 @@ else
 end
 
 print("WindUI loaded successfully!")
-
--- ============================================================
--- KEY SYSTEM
--- ============================================================
-local ValidKeys = {
-    ["JACK"] = "JACK_OWNER",
-    ["SIQEN"] = "SIQEN_DEV",
-    ["PRINCE"] = "PRINCE_USER",
-    ["MO"] = "MO_USER",
-    ["FREE"] = "FREE_USER",
-}
-
-local UserKeyRole = "FREE_USER"
-local UsedKeyString = ""
-
-local function RequestKeySystem()
-    local authenticated = false
-    
-    local KeyWindow = WindUI:CreateWindow({
-        Icon = "rbxassetid://6023202357",
-        Title = "Scripterkiddo MM2 | Key Verification",
-        Author = "by jack",
-        Folder = "Scripterkiddo_Key",
-        Size = UDim2.fromOffset(400, 300),
-        Theme = "Dark",
-        Resizable = false,
-        SideBarWidth = 0,
-        OpenButton = {
-            Title = "🔑",
-            Enabled = false,
-        }
-    })
-    
-    local KeyTab = KeyWindow:Tab({ Title = "Auth", Icon = "key" })
-    
-    KeyTab:Paragraph({
-        Title = "Welcome to Scripterkiddo MM2 Hub",
-        Desc = "Enter your access key to continue.\nKeys: JACK, SIQEN, PRINCE, MO, FREE",
-        Image = "rbxthumb://type=AvatarHeadShot&id=" .. localPlayer.UserId .. "&w=150&h=150",
-        ImageSize = 50,
-    })
-    
-    KeyTab:Divider()
-    
-    local enteredKey = ""
-    KeyTab:Input({
-        Title = "Access Key",
-        Placeholder = "Enter key...",
-        Callback = function(Text)
-            enteredKey = Text
-        end
-    })
-    
-    KeyTab:Button({
-        Title = "Verify Key",
-        Icon = "check",
-        Callback = function()
-            local cleanKey = string.upper(string.gsub(enteredKey, "^%s*(.-)%s*$", "%1"))
-            if ValidKeys[cleanKey] then
-                UserKeyRole = ValidKeys[cleanKey]
-                UsedKeyString = cleanKey
-                WindUI:Notify({
-                    Title = "Access Granted",
-                    Content = "Welcome, " .. localPlayer.DisplayName .. " [" .. UserKeyRole .. "]",
-                    Type = "success"
-                })
-                authenticated = true
-                KeyWindow:Destroy()
-            else
-                WindUI:Notify({
-                    Title = "Invalid Key",
-                    Content = "Key incorrect! Please check and try again.",
-                    Type = "error"
-                })
-            end
-        end
-    })
-    
-    KeyTab:Button({
-        Title = "Use FREE Key",
-        Icon = "unlock",
-        Callback = function()
-            UserKeyRole = "FREE_USER"
-            UsedKeyString = "FREE"
-            WindUI:Notify({
-                Title = "Access Granted",
-                Content = "Welcome, " .. localPlayer.DisplayName .. " [FREE_USER]",
-                Type = "success"
-            })
-            authenticated = true
-            KeyWindow:Destroy()
-        end
-    })
-    
-    while not authenticated do
-        task.wait(0.1)
-    end
-end
-
--- Run key system
-RequestKeySystem()
 
 -- ============================================================
 -- MAIN CONFIGURATION
@@ -232,7 +130,6 @@ local Config = {
 local PlayerData = {}
 local ESPObjects = {}
 local Connections = {}
-local IsPremium = true
 
 -- ============================================================
 -- HELPER FUNCTIONS
@@ -2151,7 +2048,7 @@ local SettingsTab = Window:Tab({ Title = "Settings", Icon = "settings" })
 -- Home Tab
 HomeTab:Paragraph({
     Title = "Hello, " .. localPlayer.DisplayName .. "!",
-    Desc = "Welcome to Scripterkiddo Murder Mystery 2 Hub\nKey Level: " .. UserKeyRole,
+    Desc = "Welcome to Scripterkiddo Murder Mystery 2 Hub\nAll features unlocked!",
     Image = "rbxthumb://type=AvatarHeadShot&id=" .. localPlayer.UserId .. "&w=150&h=150",
     ImageSize = 60,
 })
